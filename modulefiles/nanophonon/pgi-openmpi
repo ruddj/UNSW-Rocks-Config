@@ -1,0 +1,58 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict nanophonon
+
+if { ! [ is-loaded pgi ] } {
+    module load pgi
+}
+
+if {  [ is-loaded mpich ] } {
+    module rm mpich
+}
+
+if { ! [ is-loaded openmpi ] } {
+    module load openmpi/pgi
+}
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      1.0
+#
+# 2. change 'nanhome' to base directory: /usr/nan, /opt/nan, ...
+#
+set	nanhome      /share/apps/opt/nanophonon
+
+#
+# 3. change 'cpp' to compiler: pgi, intel, ...
+#
+set	cpp      pgi
+
+# 4. change 'mpi' to MPI system used: mpich, openmpi, ...
+#
+set	mpi      openmpi
+
+
+set nandir $nanhome/$cpp-$mpi
+
+if [ file isdirectory $nandir ] {
+    module-whatis	"Installs nanophonon for $cpp $mpi"
+    set helpmsg "Sets nanophonon to Compiler $cpp MPI $mpi"
+    # bring in new version
+ 
+    prepend-path PATH $nandir
+    
+} else {
+    module-whatis	"nanophonon $cpp $mpi not installed"
+    set helpmsg "nanophonon $cpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"nanophonon  $cpp $mpi not installed on [uname nodename]"
+    }
+}

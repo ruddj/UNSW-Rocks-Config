@@ -1,0 +1,71 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+# Only 1 Gaussian at a time
+conflict g03
+conflict g09
+
+set     g03dir      /share/apps/gaussian/prebin
+set     g03scratch      /state/workspace
+set     g03exe  "$g03dir/g03/bsd:$g03dir/g03"
+set     g03man   $g03dir/g03/bsd   
+set     g03gv       $g03dir/gv
+
+#Gaussian
+if [ file isdirectory $g03dir ] {
+    module-whatis	"Gaussian G03 Binaries on Share"
+    set helpmsg {Sets many variables for Gaussian simulation, 
+	uses local x64 generic binaries provided by Gaussian}
+   setenv g03root $g03dir
+
+   setenv GAUSS_SCRDIR $g03scratch
+   
+   setenv GAUSS_EXEDIR $g03exe
+   setenv GAUSS_LEXEDIR $g03dir/g03/linda-exe
+   setenv GAUSS_ARCHDIR $g03dir/g03/arch
+   setenv GMAIN  $g03exe
+   setenv G03BASIS $g03dir/g03/basis
+   
+   # Modify Paths and libraries
+   prepend-path  PATH $g03exe
+   prepend-path  LD_LIBRARY_PATH $g03exe
+   #append-path  MANPATH $g03man # Can not see any manpages in BSD 
+    
+   setenv F_ERROPT1 "271,271,2,1,2,2,2,2" 
+   #setenv MP_STACK_OVERFLOW OFF
+   #setenv TRAP_FPE "OVERFL=ABORT;DIVZERO=ABORT;INT_OVERFL=ABORT"
+   
+   ## For ia64
+   setenv FOR_IGNORE_EXCEPTIONS 1
+   # to partially avoid KAI stupidity
+   setenv KMP_DUPLICATE_LIB_OK TRUE
+   # avoid some problems on RH ES3 based systems
+   # Causes loads of problems on cluster
+   #setenv LD_ASSUME_KERNEL "2.4.1"
+    
+   set-alias sl "$g03dir/g03/tests/searchlog.csh"
+  
+  #Gauss View
+  if [ file isdirectory $g03gv ] {
+     setenv GV_DIR $g03gv
+     prepend-path  PATH  $g03gv
+     #append-path LD_LIBRARY_PATH $g03gv/lib # Done by gview when run
+     set-alias gv $g03gv/gview
+  }
+    
+  
+} else {
+    module-whatis	"Gaussian G03 not installed"
+    set helpmsg "Gaussian G03 not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"Gaussian G03 not installed on [uname nodename]"
+    }
+}
+
+

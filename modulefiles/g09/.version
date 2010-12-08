@@ -1,0 +1,5 @@
+#%Module1.0###########################################################
+##
+## version file for ACML
+##
+set ModulesVersion      "gbin"

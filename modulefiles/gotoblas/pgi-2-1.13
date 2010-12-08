@@ -1,0 +1,51 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+# Only 1 gotoBLAS at a time
+conflict gotoblas
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      1.13
+#
+# 2. change 'fftwhome' to base directory: /usr/fftw, /opt/fftw, ...
+#
+set	gbhome      /share/apps/opt/GotoBLAS2
+
+#
+# 3. change 'gbcpp' to compiler: pgi, intel, ...
+#
+set	gbcpp      pgi
+
+
+set gbdir $gbhome/$gbcpp-$version
+
+if [ file isdirectory $gbdir ] {
+    module-whatis	"Adds GotoBLAS to libraries $gbcpp $version"
+    set helpmsg "Adds GotoBLAS to libraries $gbcpp Version $version"
+    
+    # bring in new version
+    prepend-path LD_LIBRARY_PATH $gbdir
+    
+    setenv GOTO $gbdir
+    
+     #Max number of GoTO threads.
+    setenv  GOTO_NUM_THREADS 1  
+    #Max OpenMP Threads
+    #setenv  OMP_NUM_THREADS 1  
+    
+    
+} else {
+    module-whatis	"GotoBLAS $gbcpp $version not installed"
+    set helpmsg "GotoBLAS $gbcpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"GotoBLAS $gbcpp $version not installed on [uname nodename]"
+    }
+}

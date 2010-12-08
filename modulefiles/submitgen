@@ -1,0 +1,30 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+#
+# 2. change 'modhome' to base directory: /usr/fftw, /opt/fftw, ...
+#
+set	modhome      /share/apps/opt/submit
+
+set moddir /share/apps/opt/submit
+
+if [ file isdirectory $moddir ] {
+    module-whatis	"Adds SGE submission scripts to path"
+    set helpmsg "Adds SGE submission scripts to path"
+    # bring in new version
+    
+    prepend-path PATH $moddir
+
+} else {
+    module-whatis	"SGE submission scripts not installed"
+    set helpmsg "SGE submission scripts  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"SGE submission scripts not installed on [uname nodename]"
+    }
+}

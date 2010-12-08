@@ -1,0 +1,60 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict vasp
+
+if { ! [ is-loaded pgi ] } {
+    module load pgi
+}
+
+if { [ is-loaded openmpi ] } {
+    module rm openmpi/pgi
+}
+
+if { ! [ is-loaded mpich ] } {
+    module load mpich/pgi
+}
+
+
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      4.6
+#
+# 2. change 'vasphome' to base directory: /usr/vasp, /opt/vasp, ...
+#
+set	vasphome      /share/apps/opt/vasp
+
+#
+# 3. change 'cpp' to compiler: pgi, intel, ...
+#
+set	cpp      pgi
+
+# 4. change 'mpi' to MPI system used: mpich, openmpi, ...
+#
+set	mpi      mpich
+
+
+set vaspdir $vasphome/$cpp/$mpi/$version
+
+if [ file isdirectory $vaspdir ] {
+    module-whatis	"Installs vasp $version for $cpp $mpi"
+    set helpmsg "Sets vasp to Compiler $cpp MPI $mpi Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $vaspdir
+    
+} else {
+    module-whatis	"vasp $version $cpp $mpi not installed"
+    set helpmsg "vasp $cpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"vasp $version $cpp $mpi not installed on [uname nodename]"
+    }
+}

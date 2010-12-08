@@ -1,0 +1,53 @@
+#%Module8.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+prereq pgi
+
+
+#
+# 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
+#
+set     version      8.0
+#
+# 2. change 'pgihome' to base directory: /usr/pgi, /opt/pgi, ...
+#
+set	pgihome      /share/apps/opt/pgi
+
+#
+# 3. if you want to use exclusively 32-bit compilers
+#     set target linux86
+#    if you want to use exclusively 64-bit compilers
+set target linux86-64
+#    if you want the target to depend on the host
+#     use the following code
+#
+#set f [ exec arch ]
+#if { $f == "x86_64" } {
+#    set target linux86-64
+#} else {
+#    set target linux86
+#}
+
+set pgidir $pgihome/$target/$version
+set mpidir $pgidir/mpi/mpich
+
+if [ file isdirectory $mpidir/bin ] {
+    module-whatis	"Sets the MPI implementation to Default PGI MPICH $target $version"
+    set helpmsg "Sets the MPI implementation to Default PGI MPICH $target Version $version"
+
+    prepend-path PATH $mpidir/bin
+    prepend-path MANPATH $mpidir/man
+    prepend-path LD_LIBRARY_PATH $mpidir/lib
+} else {
+    module-whatis	"PGI MPICH $target $version not installed"
+    set helpmsg "PGI MPICH  $target $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"PGI MPICH $target $version not installed on [uname nodename]"
+    }
+}
