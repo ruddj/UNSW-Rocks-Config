@@ -7,9 +7,7 @@
 #
 # Written by James Rudd, james.rudd@gmail.com
 # 20090420
-# Updated 
-# $LastChangedDate: 2009-05-05 20:19:45 +1000 (Tue, 05 May 2009) $
-# $Id: mpigen.pl 41 2009-05-05 10:19:45Z ruddj $
+# Tracking now done by GIT
 ########################################
 use strict; use warnings;
 use File::Basename;

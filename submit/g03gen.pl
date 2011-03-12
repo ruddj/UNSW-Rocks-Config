@@ -7,9 +7,7 @@
 #
 # Written by James Rudd, james.rudd@gmail.com
 # 20061216
-# Updated 
-# $LastChangedDate: 2009-04-27 13:18:11 +1000 (Mon, 27 Apr 2009) $
-# $Id: g03gen.pl 40 2009-04-27 03:18:11Z ruddj $
+# Tracking now done by GIT 
 ########################################
 use strict; use warnings;
 use File::Basename;
