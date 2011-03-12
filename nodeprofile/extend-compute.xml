@@ -1,0 +1,83 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+<description>
+	Extends Compute configuration
+</description>
+
+
+<changelog>
+<![CDATA[
+  $Id: extend-compute.xml 53 2010-08-10 09:00:38Z root $
+  $Date: 2010-08-10 19:00:38 +1000 (Tue, 10 Aug 2010) $ 
+  Revision 1.1  2010-04-01 08:02:56  ruddj
+  Converted all files to file tags
+  Revision 1.0  2007/01/05 19:51:04  ruddj
+  Added Ulimit setting, changed to html &lt;
+  Made all the paths absolute values
+]]>
+</changelog>
+
+
+<!-- There may be as many packages as needed here. Just make sure you only
+     uncomment as many package lines as you need. Any empty <package></package>
+     tags are going to confuse rocks and kill the installation procedure
+-->
+
+<package> gaussian03 </package>
+<package> gaussian09 </package>
+<package>environment-modules</package>
+
+
+<post>
+	<!-- Insert your post installation script here. This
+	code will be executed on the destination node after the
+	packages have been installed. Typically configuration files
+	are built and services setup in this section. -->
+	
+# Setup Local Workspace
+if [ -d /state/partition2 ]; then
+  #mkdir -p /state/partition2
+  ln -s /state/partition2 /state/workspace
+else
+  #mkdir -p /state/partition1
+  ln -s /state/partition1 /state/workspace
+fi
+
+
+<!-- Configure Modules -->
+<file name="/usr/share/Modules/init/.modulespath" perms="0744">
+<![CDATA[
+/usr/share/Modules/modulefiles          # Module pkg modulefiles
+/etc/modulefiles                        # General module files
+/share/apps/modulefiles                 # Net modulefiles
+]]>
+</file>
+
+<!-- Remove memory limits -->
+<file name="/etc/profile.d/ulimit.sh" perms="0755">
+ulimit -s unlimited
+</file>
+
+<file name="/gaussian/g03/Default.Route" perms="0744">
+-M- 800MB
+-P- 4
+-#- MaxDisk=100GB
+-#- Int=FMMNAtoms=50000
+-S- PVGauss_<var name="Node_Hostname"/>
+
+</file>
+	
+<file name="/gaussian/g09/Default.Route" perms="0744">
+-M- 800MB
+-P- 4
+-#- MaxDisk=100GB
+-#- Int=FMMNAtoms=50000
+-S- PVGauss_<var name="Node_Hostname"/>
+
+</file>
+
+</post>
+
+</kickstart> 

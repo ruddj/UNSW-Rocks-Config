@@ -1,0 +1,27 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+  
+<description>
+Specialized Dell compute node config. (Single HDD)
+</description>
+
+  
+<changelog>
+ Need to add Symbolic link to shared temp storage.
+</changelog>
+
+<post>
+
+<file name="/etc/motd" mode="append">
+Dell Compute Appliance
+</file>
+
+echo "Dell XML"
+# Setup Local Workspace
+#/bin/mkdir /state/partition1
+/bin/ln -s /state/partition1 /state/workspace
+
+</post>
+
+</kickstart> 

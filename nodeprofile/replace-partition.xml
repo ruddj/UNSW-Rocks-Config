@@ -1,0 +1,83 @@
+<?xml version="1.0" standalone="no"?>
+
+<kickstart>
+
+<description>
+
+	This configures the differetn paritioning for 1 and 2 disk nodes. 
+
+</description>
+
+
+<changelog>
+<![CDATA[
+  $Id: replace-partition.xml 47 2010-04-01 08:23:34Z ruddj $
+  $Date: 2010-04-01 19:23:34 +1100 (Thu, 01 Apr 2010) $ 
+]]>
+</changelog>
+
+
+<pre arg="--interpreter /opt/rocks/bin/python">
+
+import rocks_partition       
+
+membership = '<var name='Node_Membership'/>'
+nodename = '<var name="Node_Hostname"/>'
+
+def doShare(file, disks):
+        file.write('clearpart --all --initlabel --drives=%s\n'
+                % ','.join(disks))
+
+        for disk in disks:
+                if disk == disks[0]:
+                        part = 'part / --size=10000 --fstype=ext3 ' + \
+                                '--ondisk=%s\n' % disk
+                        file.write(part)
+
+                        part = 'part /var --size=6000 --fstype=ext3 ' + \
+                                '--ondisk=%s\n' % disk
+                        file.write(part)
+			part = 'part swap --size=12000 --fstype=ext3 ' + \
+                                '--ondisk=%s\n' % disk 
+                        file.write(part)
+			part = 'part /state/partition1 --size=1 --grow --fstype=ext3 ' + \
+                                '--ondisk=%s\n' % disk 
+                        file.write(part)
+		else:
+			part = 'part swap --size=2000 --fstype=ext3 ' + \
+                                '--ondisk=%s\n' % disk
+                        file.write(part)
+			part = 'part /state/partition2 --size=1 --grow --fstype=ext3 ' + \
+                                '--ondisk=%s\n' % disk 
+                        file.write(part)
+
+
+
+def doDisk(file, disk):
+        file.write('clearpart --all --initlabel --drives=%s\n' % disk)
+        file.write('part / --size=8000 --fstype=ext3 --ondisk=%s\n' % disk)
+        file.write('part /var --size=4000 --fstype=ext3 --ondisk=%s\n' % disk)
+        file.write('part swap --size=16000 --ondisk=%s\n' % disk)
+        file.write('part /state/partition1 --size=1 --grow --fstype=ext3 --ondisk=%s\n'
+                % disk)
+
+#                            
+# main
+#
+p = rocks_partition.RocksPartition()
+disks = p.getDisks()
+
+file = open('/tmp/user_partition_info', 'w')
+
+if len(disks) == 2:
+	doShare(file, disks)
+elif len(disks) == 1:
+	doDisk(file, disks[0])
+
+file.close()
+
+</pre>
+
+
+</kickstart> 
+
