@@ -131,6 +131,8 @@ print SCRIPT <<SGESET;
 \#\$ -cwd
 \# Merge stdout and stderr stream of job (y/n).
 \#\$ -j y
+\# Have SGE Notify job it is about to be terminated
+\#\$ -notify
 \# Define the job\'s relative priority (-1023 to 1024); Std 0.
 \#\$ -p 0
 \# Following are soft settings
