@@ -1,0 +1,6 @@
+# Version: 6.2u5
+# 
+# DO NOT MODIFY THIS FILE MANUALLY!
+# 
+group_name @allhosts
+hostlist compute-0-0.local compute-0-2.local compute-0-3.local compute-0-1.local compute-0-4.local compute-1-4.local compute-1-3.local compute-1-2.local compute-1-6.local compute-1-8.local compute-1-9.local compute-1-0.local compute-1-7.local compute-1-10.local compute-1-12.local compute-1-11.local compute-1-13.local compute-1-1.local compute-1-5.local

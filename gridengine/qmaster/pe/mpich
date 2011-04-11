@@ -1,0 +1,15 @@
+# Version: 6.2u5
+# 
+# DO NOT MODIFY THIS FILE MANUALLY!
+# 
+pe_name            mpich
+slots              9999
+user_lists         NONE
+xuser_lists        NONE
+start_proc_args    /opt/gridengine/mpi/startmpi.sh -catch_rsh $pe_hostfile
+stop_proc_args     /opt/gridengine/mpi/stopmpi.sh
+allocation_rule    $fill_up
+control_slaves     TRUE
+job_is_first_task  FALSE
+urgency_slots      min
+accounting_summary TRUE

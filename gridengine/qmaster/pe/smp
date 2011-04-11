@@ -1,0 +1,15 @@
+# Version: 6.2u5
+# 
+# DO NOT MODIFY THIS FILE MANUALLY!
+# 
+pe_name            smp
+slots              9999
+user_lists         NONE
+xuser_lists        NONE
+start_proc_args    NONE
+stop_proc_args     NONE
+allocation_rule    $pe_slots
+control_slaves     FALSE
+job_is_first_task  TRUE
+urgency_slots      min
+accounting_summary TRUE
