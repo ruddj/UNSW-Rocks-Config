@@ -1,0 +1,10 @@
+Some queue supersed others, or allow jobs to be better spread out
+
+Optima Nodes
+dell.qm (master) compute.q (slaves)
+
+Hexacore Dells
+dell.hex
+
+Remaining quad core dells
+dell.q, dell.pe[2]
