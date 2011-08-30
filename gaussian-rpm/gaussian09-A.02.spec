@@ -49,6 +49,11 @@ sed -i -s 's/\/usr\/local\/bin\/perl/\/usr\/bin\/perl/' $RPM_BUILD_ROOT/gaussian
 sed -i -s 's/\/usr\/local\/bin\/perl/\/usr\/bin\/perl/' $RPM_BUILD_ROOT/gaussian/g09/tests/*.pl
 sed -i -s 's/use GauUtil/#use GauUtil/' $RPM_BUILD_ROOT/gaussian/g09/bsd/fetch-ref
 
+# allow Linda to use SGE rsh
+sed -i 's/exec \/usr\/bin\/rsh /exec rsh /' $RPM_BUILD_ROOT/gaussian/g09/linda8.2/opteron-linux/bin/linda_rsh
+# Use fast SSH algorithm
+sed -i 's/exec \/usr\/bin\/ssh -x /exec \/usr\/bin\/ssh -x -c arcfour /' $RPM_BUILD_ROOT/gaussian/g09/linda8.2/opteron-linux/bin/linda_rsh
+
 #cleanup paths, hard codes location
 find $RPM_BUILD_ROOT/gaussian/g09 -type f | xargs -n 1 chrpath 2>&1 | grep RPATH | sed -e 's/:.*//' > /tmp/chrpath.todo
 chrpath -r /gaussian/g09 `cat /tmp/chrpath.todo`
