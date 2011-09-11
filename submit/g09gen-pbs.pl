@@ -23,6 +23,7 @@ MAIN:
 my $home=`echo \$HOME`;
 chomp($home);
 my $CONFIGFILE="$home/.G03SGE";
+my $TSNET="$home/.tsnet.config";
 my $gaussFile=$ARGV[0];
 my $numNodes = 1;
 $numNodes=$ARGV[1] if (@ARGV >= 2);
@@ -43,6 +44,21 @@ $numNodes = 1 if ($numNodes <2); #Need at least 2 to use linda
 
 #get basename
 my ($file,$dir,$ext) = fileparse($gaussFile, qr/\.[^.]*/);
+
+# Check Linda config exists. Needed to use SSH protcol
+if (! -f $TSNET){
+	print "\Creating Linda config file $TSNET\n";
+	open CONFIG, " > $TSNET";
+	print CONFIG <<CONF;
+Tsnet.Appl.suffix: False
+Tsnet.Appl.verbose: True
+Tsnet.Appl.veryverbose: False
+
+Tsnet.Node.lindarsharg: ssh
+
+CONF
+	close CONFIG;
+}
 
 #read in defaults
 if ( -f $CONFIGFILE){
