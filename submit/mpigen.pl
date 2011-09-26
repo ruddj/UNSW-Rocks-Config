@@ -99,17 +99,17 @@ print "\tCreating SGE submit file: $submitfile\n";
 
 my $queueAllo;
 if ($numNodes) {
-	print "\t\twith $numNodes nodes and $numCores cores.\n";
-	$queueAllo = "\# Use Parallel Queue (sequence: dell.pe,compute.q,dell.q,dell.qm)\n\# You must include masterq queue in this list\n";
-	$queueAllo .= "\#\$ -q dell.pe,compute.q,dell.q\n";
-	$queueAllo .= "\# The master process must run on a node in this queue(either dell.q or dell.qm)\n";
-	$queueAllo .= "\# Use dell.q if you do not have rights to dell.qm. (Optional)\n";
-	$queueAllo .= "\# \$ -masterq dell.q\n";
-} 
+        print "\t\twith $numNodes nodes and $numCores cores.\n";
+        $queueAllo = "\# Use Parallel Queue (sequence: dell.pe1,dell.pe2,compute.q)\n\# You must include masterq queue in this list\n";
+        $queueAllo .= "\#\$ -q dell.pe1,dell.pe2,compute.q\n";
+        $queueAllo .= "\# The master process must run on a node in this queue(either dell.pe1 or dell.pe2)\n# Use dell.pe2 if you do not have rights to dell.pe1\n";
+        $queueAllo .= "\#\$ -masterq dell.pe1,dell.pe2\n";
+        $queueAllo .= "\# \n\# Setting gauss=0 allows slave calculations to run on nodes already doing calculations.\n#  \$ -l gauss=0";
+}
 else {
-	print "\t\twith 1 node\n";
-	$queueAllo = "\# Use the Standard Queues (can be compute.q,dell.q)\n\#\$ -q compute.q,dell.q";
-} 
+        print "\t\twith 1 node\n";
+        $queueAllo = "\# Use the Standard Queues (can be compute.q,single.q,single.ql)\n\#\$ -q compute.q,single.q,single.ql";
+}
 print "\tCheck generated file and submit with 'qsub $submitfile'\n";
 
 # SGE Options
