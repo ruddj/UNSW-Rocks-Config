@@ -1,0 +1,5 @@
+root@PVCentre.pv.unsw.edu.au dirk.koenig@unsw.edu.au
+
+# Added to remove messages from nodes addressed to root@local
+#root@local  dirk.koenig@unsw.edu.au
+#root@local  james.rudd@gmail.com

@@ -1,0 +1,15 @@
+root@local  dirk.koenig@unsw.edu.au
+root@unsw.edu.au  dirk.koenig@unsw.edu.au
+dko@local   dirk.koenig@unsw.edu.au
+dko@unsw.edu.au dirk.koenig@unsw.edu.au
+ruddj@unsw.edu.au  james.rudd@unsw.edu.au
+@local @unsw.edu.au
+@pv.unsw.edu.au @unsw.edu.au
+#root@unsw.edu.au james.rudd@gmail.com
+
+# Following fix local address redicretion
+ruddj  james.rudd@unsw.edu.au
+dko   dirk.koenig@unsw.edu.au
+#root   dirk.koenig@unsw.edu.au
+mansfieldd  dman@cse.unsw.EDU.AU
+lhu lunmei.huang@unsw.edu.au
