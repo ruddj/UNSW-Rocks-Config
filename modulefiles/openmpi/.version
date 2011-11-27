@@ -2,4 +2,4 @@
 ##
 ## version file for MPICH
 ##
-set ModulesVersion      "pgi"
+set ModulesVersion      "1.4.4-pgi-11.10"

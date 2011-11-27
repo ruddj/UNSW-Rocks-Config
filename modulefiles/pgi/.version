@@ -2,5 +2,4 @@
 ##
 ## version file for Pgi
 ##
-#set ModulesVersion      "8.0"
-set ModulesVersion      "10.9"
+set ModulesVersion      "11.10"

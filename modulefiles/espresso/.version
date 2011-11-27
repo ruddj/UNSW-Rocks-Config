@@ -2,4 +2,4 @@
 ##
 ## version file for Vasp
 ##
-set ModulesVersion      "pgi-ompi-4.0.5"
+set ModulesVersion      "4.3.2-pgi-ompi-11.10"

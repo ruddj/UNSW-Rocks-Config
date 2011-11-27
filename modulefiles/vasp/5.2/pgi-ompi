@@ -21,7 +21,7 @@ if {  [ is-loaded mpich ] } {
 }
 
 if { ! [ is-loaded openmpi ] } {
-    module load openmpi/pgi
+    module load openmpi
 }
 
 #

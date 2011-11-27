@@ -2,4 +2,4 @@
 ##
 ## version file for ACML
 ##
-set ModulesVersion      "pgi-4.2.0"
+set ModulesVersion      "pgi-4.4.0"

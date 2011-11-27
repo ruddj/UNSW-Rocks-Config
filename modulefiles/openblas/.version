@@ -1,5 +1,5 @@
 #%Module1.0###########################################################
 ##
-## version file for MPICH
+## version file for FFFTW
 ##
-set ModulesVersion      "10.9"
+set ModulesVersion      "0.1-pgi-11.10"
