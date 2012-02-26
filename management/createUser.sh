@@ -44,6 +44,7 @@ echo "\"${NEW_USER}  ${NEW_EMAIL} \">> /etc/postfix/sender-canonical"
 echo "${NEW_USER}  ${NEW_EMAIL}" >> /etc/postfix/sender-canonical
 echo "\"${NEW_EMAIL}\" > /export/home/${NEW_USER}/.forward"
 echo "${NEW_EMAIL}" > /export/home/${NEW_USER}/.forward
+chown ${NEW_USER} /export/home/${NEW_USER}/.forward
 
 # End Loop
 
