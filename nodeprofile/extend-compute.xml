@@ -23,12 +23,10 @@
 <!-- There may be as many packages as needed here. Just make sure you only
      uncomment as many package lines as you need. Any empty <package></package>
      tags are going to confuse rocks and kill the installation procedure
--->
 
-<package> gaussian03 </package>
-<package> gaussian09 </package>
+
 <package>environment-modules</package>
-
+-->
 
 <post>
 	<!-- Insert your post installation script here. This
@@ -36,48 +34,47 @@
 	packages have been installed. Typically configuration files
 	are built and services setup in this section. -->
 	
-# Setup Local Workspace
-if [ -d /state/partition2 ]; then
-  #mkdir -p /state/partition2
-  ln -s /state/partition2 /state/workspace
-else
-  #mkdir -p /state/partition1
-  ln -s /state/partition1 /state/workspace
-fi
-
-
 <!-- Configure Modules -->
-<file name="/usr/share/Modules/init/.modulespath" perms="0744">
+<file name="/etc/profile.d/modules.sh"  mode="append">
 <![CDATA[
-/usr/share/Modules/modulefiles          # Module pkg modulefiles
-/etc/modulefiles                        # General module files
-/share/apps/modulefiles                 # Net modulefiles
+export -f module
 ]]>
 </file>
 
-<!-- Remove memory limits -->
-<file name="/etc/profile.d/ulimit.sh" perms="0755">
-ulimit -s unlimited
+<file name="/opt/torque/mom_priv/config" mode="append">
+<![CDATA[
+$pbsclient fyr.pvcentre.pv.unsw.edu.au
+$pbsclient 10.1.1.1
+$tmpdir    /state/partition1
+]]>
 </file>
 
-<file name="/gaussian/g03/Default.Route" perms="0744">
--M- 800MB
--P- 4
--#- MaxDisk=100GB
--#- Int=FMMNAtoms=50000
--S- PVGauss_<var name="Node_Hostname"/>
+<file name="/etc/rc.d/rocksconfig.d/post-03-411get" perms="0700">
+<![CDATA[
+#!/bin/bash
 
-</file>
-	
-<file name="/gaussian/g09/Default.Route" perms="0744">
--M- 800MB
--P- 4
--#- MaxDisk=100GB
--#- Int=FMMNAtoms=50000
--S- PVGauss_<var name="Node_Hostname"/>
+# Tell frontend to send you the 411 shared key
+/opt/rocks/bin/get-411-key 10.1.1.1
 
+# Wait 120 seconds for shared key to get populated
+for i in {1..12}; do
+        [ ! -f /etc/411-security/shared.key ] && sleep 10s
+done
+
+# If shared key got transferred, do a 411get and pull information
+# from frontend
+
+[ -f /etc/411-security/shared.key ] && /opt/rocks/bin/411get --all
+
+if [ -f /etc/rc3.d/S*autofs || -f /etc/rc5.d/S*autofs ]; then
+        /sbin/service autofs restart
+fi
+
+[ -f /etc/411-security/shared.key ] && rm -rf /etc/rc.d/rocksconfig.d/post-03-411get
+]]>
 </file>
 
 </post>
 
 </kickstart> 
+
