@@ -1,0 +1,49 @@
+#
+# Create queues and set their attributes.
+#
+#
+# Create and define queue intel
+#
+create queue intel
+set queue intel queue_type = Execution
+set queue intel Priority = 40
+set queue intel resources_default.neednodes = intel
+set queue intel enabled = True
+set queue intel started = True
+#
+# Create and define queue amd
+#
+create queue amd
+set queue amd queue_type = Execution
+set queue amd Priority = 40
+set queue amd resources_default.neednodes = amd
+set queue amd enabled = True
+set queue amd started = True
+#
+# Create and define queue default
+#
+create queue default
+set queue default queue_type = Execution
+set queue default Priority = 40
+set queue default resources_default.nodes = 1
+set queue default resources_default.walltime = 02:00:00
+set queue default enabled = True
+set queue default started = True
+#
+# Set server attributes.
+#
+set server scheduling = True
+set server acl_host_enable = False
+set server acl_hosts = fyr.pvcentre.pv.unsw.edu.au
+set server managers = evatt@fyr.pvcentre.pv.unsw.edu.au
+set server managers += maui@fyr.pvcentre.pv.unsw.edu.au
+set server managers += root@fyr.pvcentre.pv.unsw.edu.au
+set server managers += ruddj@fyr.pvcentre.pv.unsw.edu.au
+set server default_queue = default
+set server log_events = 511
+set server mail_from = adm
+set server query_other_jobs = True
+set server scheduler_iteration = 600
+set server node_check_rate = 150
+set server tcp_timeout = 6
+set server next_job_number = 991
