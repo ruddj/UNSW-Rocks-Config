@@ -1,5 +1,5 @@
-#%Module1.0###########################################################
+#%Module1.0
 ##
-## version file for MPICH
+##  The desired version of X11
 ##
-set ModulesVersion      "1.4.4-pgi-11.10"
+set ModulesVersion "1.4.5-pgi-12.3"
