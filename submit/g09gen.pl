@@ -12,7 +12,7 @@
 use strict; use warnings;
 use File::Basename;
 
-die "Usage: g09gen GaussFileName [NumNodes]" unless (@ARGV >= 1);
+die "Usage: g09gen GaussFileName" unless (@ARGV >= 1);
 print "SGE submission script generation\n";
 
 sub CheckSettings($); 
@@ -27,7 +27,7 @@ chomp($home);
 my $CONFIGFILE="$home/.G03SGE";
 my $gaussFile=$ARGV[0];
 my $numNodes = 0;
-$numNodes=$ARGV[1] if (@ARGV >= 2);
+# $numNodes=$ARGV[1] if (@ARGV >= 2);
 
 my $MEM="400MB";
 my $MEMOD=0; #overide value
@@ -36,6 +36,29 @@ my $PROCSHAREDOD=1; #overide value
 
 my $EMAILNOTIFY="beas";
 my $EMAIL="dirk.koenig\@unsw.edu.au";
+
+# Queues
+
+my $queueSelect = 1;
+
+my %queues = (
+	'1' =>  {
+	    'name' => 'SC1435',
+	    'queue' => 'single.q',
+	    'cpu' => 4,
+	    'par' => 1,
+	    'pqueue' => 'dell.pe1,dell.pe2',
+	    'desc' => 'Jobs on 4 core Dell SC1435'
+	    },
+	'2'   =>  {
+	    'name' => 'R815',
+	    'queue' => 'r815.q',
+	    'cpu' => 64,
+	    'par' => 1,
+	    'pqueue' => 'r815.q',
+	    'desc' => 'Jobs on 64 core Dell R815'
+	    }
+);
 
 
 # Data Checks
@@ -56,12 +79,6 @@ if ( -f $CONFIGFILE){
 		
 		if ($line =~ /^MEMOD[\s]*=[\s]*([\d]+)/i){
 			$MEMOD=$1;
-		}
-		elsif ($line =~ /^PROCSHAREDOD[\s]*=[\s]*([\d]+)/i){
-			$PROCSHAREDOD=$1;
-		}
-		elsif ($line =~ /^PROCSHARED[\s]*=[\s]*([\d]+)/i){
-			$PROCSHARED=$1;
 		}
 		elsif ($line =~ /^EMAILNOTIFY[\s]*=[\s]*([\w]+)/i){ 
 			if ($line =~ /^EMAILNOTIFY[\s]*=[\s]*([beasn]+)[\s]*(#|$)/i){ 
@@ -92,12 +109,47 @@ else {
 #Following sets options inside Gaussian file
 #MEM=440MB 		# Set the memory / CPU
 #MEMOD=0 		# Overide the memory value
-PROCSHARED=4		# Use this many shared processors in Gaussian File
-PROCSHAREDOD=1		# Overide the number of shared CPU value
 
 CONF
 	close CONFIG;
 }
+
+# Print list of Queues
+
+print "These nodes are avalible:\n";
+
+foreach my $queue ( sort keys %queues )  {
+    print "$queue.\t" . $queues{$queue}{'name'} . "\t" . $queues{$queue}{'desc'} . "\n" ;
+}
+
+# Ask user which Queue
+print "Please type a number corresponding to the nodes you would like to use:\n";
+my $answer;
+chomp($answer=<STDIN>);
+
+if (exists $queues{$answer}) {
+	$queueSelect = $answer;
+}
+else {
+	die "Could not find chosen queue. Exiting.\n";
+}
+
+# If Parallel then ask how many nodes 
+if ($queues{$queueSelect}{'par'} ) {
+	print "How many nodes would you like the job to run on?\n";
+	chomp($answer=<STDIN>);
+	if ($answer =~ /\D/) {
+		die "$answer is not a number.";
+	}
+	$numNodes = $answer;
+	$numNodes = 0 if ($numNodes <2); #Need at least 2 to use linda
+}
+else {
+
+}
+
+$PROCSHARED = $queues{$queueSelect}{'cpu'};
+
 
 my $numCores = $numNodes * $PROCSHARED;
 
@@ -107,17 +159,17 @@ open SCRIPT, "> submit$file.sh" or die "Could not create file";
 print "\tCreating SGE file: submit$file.sh\n";
 
 my $queueAllo;
-if ($numNodes) {
+if ($numNodes > 1) {
 	print "\t\twith $numNodes nodes and $numCores cores.\n";
-	$queueAllo = "\# Use Parallel Queue (sequence: dell.pe1,dell.pe2,compute.q)\n\# You must include masterq queue in this list\n";
-	$queueAllo .= "\#\$ -q dell.pe1,dell.pe2,compute.q\n";
+	$queueAllo = "\# Use Parallel Queue \n\# You must include the masterq queue in this list\n";
+	$queueAllo .= "\#\$ -q ". $queues{$queueSelect}{'pqueue'} . "\n";
 	$queueAllo .= "\# The master process must run on a node in this queue(either dell.pe1 or dell.pe2)\n# Use dell.pe2 if you do not have rights to dell.pe1\n";
-	$queueAllo .= "\#\$ -masterq dell.pe1,dell.pe2\n";
+	$queueAllo .= "\#\$ -masterq ". $queues{$queueSelect}{'pqueue'} . "\n";
 	$queueAllo .= "\# \n\# Setting gauss=0 allows slave calculations to run on nodes already doing calculations.\n#  \$ -l gauss=0";
 } 
 else {
 	print "\t\twith 1 node\n";
-	$queueAllo = "\# Use the Standard Queues (can be compute.q,single.q,single.ql)\n\#\$ -q compute.q,single.q,single.ql";
+	$queueAllo = "\# Use the Standard Queues (can be single.q,r815.q)\n\#\$ -q ". $queues{$queueSelect}{'queue'};
 } 
 
 # SGE Options
@@ -144,7 +196,7 @@ $queueAllo
 \# Remainder are hard settings
 \#\$ -hard
 \# Remove spaces between #\$ to force excution on a specific node
-\#  \$ -l hostname="compute-0-?"
+\#  \$ -l hostname="compute-1-?"
 SGESET
 
 
@@ -156,7 +208,7 @@ print SCRIPT "\# Notify these e-mail addresses.\n",
 	"\#\$ -m $EMAILNOTIFY\n",
 }
 
-if ($numNodes){
+if ($numNodes > 1){
 	print SCRIPT "\# Request processors for parallel jobs.(nodes * proc/node)\n",
 	"\#\$ -pe g03 " . $numNodes * $PROCSHARED ."\n";
 } 
@@ -172,10 +224,8 @@ print SCRIPT  <<GAOPT;
 
 echo "Working directory is:"
 pwd
-\# Gaussian Environment settings
-\#export g09root=\"$G03ROOT\"
-\# source \$g09root/g09/bsd/g09.profile
 source /etc/profile
+
 \# Loads Gaussian application directory
 module load g09
 
@@ -202,7 +252,7 @@ print SCRIPT "echo \"Log File is: \$GAUSS_LOG\"\n";
 # Linda Options	
 # May need to add commands to create scratch directories on nodes using SSH
 # may also need to sort node list so Master started on highmem pcs
-if ($numNodes){
+if ($numNodes > 1){
 	my $lindaNodes=$numNodes-1;
 	print SCRIPT <<LINDA;
 	
