@@ -2,22 +2,11 @@
 # Create queues and set their attributes.
 #
 #
-# Create and define queue amd
-#
-create queue amd
-set queue amd queue_type = Execution
-set queue amd Priority = 40
-set queue amd resources_default.neednodes = amd
-set queue amd keep_completed = 120
-set queue amd enabled = True
-set queue amd started = True
-#
 # Create and define queue interlagos
 #
 create queue interlagos
 set queue interlagos queue_type = Execution
 set queue interlagos Priority = 40
-set queue interlagos resources_default.neednodes = interlagos
 set queue interlagos keep_completed = 120
 set queue interlagos enabled = True
 set queue interlagos started = True
@@ -27,20 +16,27 @@ set queue interlagos started = True
 create queue intel
 set queue intel queue_type = Execution
 set queue intel Priority = 40
-set queue intel resources_default.neednodes = intel
 set queue intel keep_completed = 120
 set queue intel enabled = True
 set queue intel started = True
+#
+# Create and define queue amd
+#
+create queue amd
+set queue amd queue_type = Execution
+set queue amd Priority = 40
+set queue amd keep_completed = 120
+set queue amd enabled = True
+set queue amd started = True
 #
 # Set server attributes.
 #
 set server scheduling = True
 set server acl_host_enable = False
 set server acl_hosts = FyrHead.ad.unsw.edu.au
-set server managers = evatt@*
-set server managers += maui@*
-set server managers += root@*
-set server managers += ruddj@*
+set server acl_hosts += fyrhead.ad.unsw.edu.au
+set server managers = maui@fyrhead.ad.unsw.edu.au
+set server managers += root@fyrhead.ad.unsw.edu.au
 set server default_queue = amd
 set server log_events = 511
 set server mail_from = adm
@@ -50,5 +46,5 @@ set server node_check_rate = 150
 set server tcp_timeout = 6
 set server submit_hosts = login-0-0
 set server allow_node_submit = True
-set server next_job_number = 0
+set server next_job_number = 34
 set server moab_array_compatible = True
