@@ -3,7 +3,7 @@
 <kickstart>
 
 <description>
-        Extends Compute configuration
+        Extends Login configuration
 </description>
 
 
@@ -25,11 +25,18 @@
 
 <!-- Updated Kernel for AMD Interlagos Support -->
 <!--  <package>kernel-ml</package>
-<package>kernel-ml-devel</package>
-<package>kernel-ml-doc</package>
-<package>kernel-ml-headers</package>
+<package>vim</package>
+<package>vim-enhanced</package>
+<package>vim-common</package>
  -->
 
+<package>vim</package>
+<package>vim-enhanced</package>
+<package>vim-common</package>
+
+
+<!-- Fail 2 Ban to lockdown Login Nodes -->
+<package>fail2ban</package>
 
 <post>
         <!-- Insert your post installation script here. This
@@ -44,10 +51,12 @@ export -f module
 ]]>
 </file>
 
-<file name="/var/spool/torque/mom_priv/config" mode="append">
-$pbsclient &Kickstart_PublicHostname;
-$pbsclient &Kickstart_PrivateAddress;
+<file name="/opt/torque/mom_priv/config" mode="append">
+<![CDATA[
+$pbsclient FyrHead.ad.unsw.edu.au
+$pbsclient 10.1.1.1
 $tmpdir    /state/partition1
+]]>
 </file>
 
 <file name="/etc/rc.d/rocksconfig.d/post-03-411get" perms="0700">
@@ -78,6 +87,35 @@ fi
 
 ]]>
 </file>
+
+<file name="/etc/ssh/sshd_config" mode="append">
+<![CDATA[
+Port 22
+Port 2052
+PermitRootLogin without-password
+]]>
+</file>
+
+
+<file name="/etc/fail2ban/jail.local" mode="append">
+<![CDATA[
+[DEFAULT]
+ignoreip = 127.0.0.1 10.1.1.1
+bantime  = 600
+findtime  = 600
+maxretry = 5
+backend = auto
+
+[ssh-iptables]
+enabled  = true
+filter   = sshd
+action   = iptables-allports[name=SSH, protocol=all]
+logpath  = /var/log/secure
+maxretry = 5
+
+]]>
+</file>
+
 
 </post>
 
