@@ -1,0 +1,5 @@
+#%Module1.0###########################################################
+##
+## version file for Vasp
+##
+set ModulesVersion      "4.3.2-pgi-ompi-11.10"

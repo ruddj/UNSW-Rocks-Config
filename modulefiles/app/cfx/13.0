@@ -1,0 +1,19 @@
+#%Module######################################################################
+##
+##      CFX modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "Set environment for CFX $version"
+}
+
+set base_path /share/apps/opt/ansys
+set version   13.0
+
+module-whatis "Setup CFX $version"
+
+set path $base_path/$version
+
+prepend-path PATH $path/v130/CFX/bin
+
+setenv CFX5RSH ssh
+

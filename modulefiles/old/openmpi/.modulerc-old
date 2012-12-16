@@ -1,0 +1,4 @@
+#%Module1.0
+##
+module-version      "openmpi/pgi/1.4.3-11.8"	"default"
+

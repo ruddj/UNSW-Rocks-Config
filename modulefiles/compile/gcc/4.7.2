@@ -1,0 +1,47 @@
+#%Module8.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict pgi
+
+#
+# 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
+#
+set     version     4.7.2 
+#
+# 2. change 'gcchome' to base directory: /usr/gcc, /opt/gcc, ...
+#
+set	gcchome      /share/apps/opt/gcc
+
+set gccdir $gcchome/$version/rtf
+
+
+if [ file isdirectory $gccdir/bin ] {
+    module-whatis	"Changes the GCC home directory to $version"
+    set helpmsg "Changes the GCC home directory to Version $version"
+    # bring in new version
+    setenv GCC $gcchome
+    setenv GCCDIR $gccdir
+    # Set as default compiler
+    setenv           COMPILER gcc
+    setenv           CC gcc
+    setenv           FC gfortran
+    setenv           CXX g++
+    prepend-path     C_INCLUDE_PATH  $gccdir/include
+    prepend-path     INCLUDE         $gccdir/include
+    prepend-path     PATH            $gccdir/bin
+    prepend-path     LD_LIBRARY_PATH $gccdir/lib:$gccdir/lib64
+    prepend-path     MANPATH         $gccdir/share/man  
+    
+} else {
+    module-whatis	"GCC $version not installed"
+    set helpmsg "GCC $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"GCC $version not installed on [uname nodename]"
+    }
+}
