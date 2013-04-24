@@ -36,6 +36,31 @@ my $PROCSHAREDOD=1; #overide value
 my $EMAILNOTIFY="abe";
 my $EMAIL="dirk.koenig\@unsw.edu.au";
 
+# Queues
+
+my $queueSelect = 1;
+
+my %queues = (
+	'1' =>  {
+	    'name' => 'SC1435',
+	    'queue' => 'core4-2216',
+	    'cpu' => 4,
+	    'par' => 1,
+	    'pqueue' => 'core4-2216',
+	    'maxmem' => 'mem=7gb,vmem=8gb',
+	    'desc' => 'Jobs on 4 core Dell SC1435'
+	    },
+	'2'   =>  {
+	    'name' => 'R815',
+	    'queue' => 'core64-6272',
+	    'cpu' => 64,
+	    'par' => 1,
+	    'pqueue' => 'core64-6272',
+	    'maxmem' => 'mem=125gb,vmem=126gb',
+	    'desc' => 'Jobs on 64 core Dell R815'
+	    }
+);
+
 
 # Data Checks
 die "Could not read $gaussFile\n" if (! -f $gaussFile);
@@ -113,6 +138,43 @@ CONF
 	close CONFIG;
 }
 
+# Print list of Queues
+
+print "These nodes are avalible:\n";
+
+foreach my $queue ( sort keys %queues )  {
+    print "$queue.\t" . $queues{$queue}{'name'} . "\t" . $queues{$queue}{'desc'} . "\n" ;
+}
+
+# Ask user which Queue
+print "Please type a number corresponding to the nodes you would like to use:\n";
+my $answer;
+chomp($answer=<STDIN>);
+
+if (exists $queues{$answer}) {
+	$queueSelect = $answer;
+}
+else {
+	die "Could not find chosen queue. Exiting.\n";
+}
+
+# If Parallel then ask how many nodes 
+if ($queues{$queueSelect}{'par'} ) {
+	print "How many nodes would you like the job to run on?\n";
+	chomp($answer=<STDIN>);
+	if ($answer =~ /\D/) {
+		die "$answer is not a number.";
+	}
+	$numNodes = $answer;
+	$numNodes = 1 if ($numNodes <2); #Need at least 2 to use linda
+}
+else {
+
+}
+
+$PROCSHARED = $queues{$queueSelect}{'cpu'};
+
+
 my $numCores = $numNodes * $PROCSHARED;
 
 #create default script
@@ -121,6 +183,7 @@ open SCRIPT, " > $submitFile" or die "Could not create file";
 
 print "\tCreating PBS file: $submitFile\n";
 
+my $queueAllo;
 if ($numNodes > 1) {
         print "\t\twith $numNodes nodes, $PROCSHARED cores/node, Total $numCores cores.\n";
 }
@@ -140,15 +203,18 @@ print SCRIPT <<PBSSET;
 \# Merge stdout and stderr stream of job (y/n).
 \#PBS -j oe
 
+\# Set queue
+#PBS -q $queues{$queueSelect}{'queue'}
+
 \# Memory Requirments (Max mem=80gb,vmem=40gb)
 \# This sets a hard memory limit within the shell. 
 \# If not set defaults to 1GB
 \# Increase if g09 returns galloc errors 
-\#PBS -l mem=60gb,vmem=40gb
+\#PBS -l $queues{$queueSelect}{'maxmem'}
 \# Number of Nodes, Processor per node
 \#PBS -l nodes=$numNodes:ppn=$PROCSHARED
-\# How long will it run [[HH:]MM:]SS This needs to be set.
-\#PBS -l walltime=8:00:00
+\# How long will it run [[HH:]MM:]SS 
+\# PBS -l walltime=8:00:00
 
 PBSSET
 
@@ -168,11 +234,13 @@ cd \$PBS_O_WORKDIR
 
 echo "Working directory is:"
 pwd
+source /etc/profile
+
 \# Loads Gaussian application directory
-module load gaussian
+module load g09
 
 export GAUSS_JOBID=\`echo \$PBS_JOBID | cut -d. -f1\`
-export GAUSS_SCRDIR=\"\$GAUSS_SCRDIR/\$GAUSS_JOBID\"
+\#export GAUSS_SCRDIR=\"\$GAUSS_SCRDIR/\$GAUSS_JOBID\"
 export GAUSS_USER=\$PBS_O_WORKDIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
 export g09error=""
@@ -193,19 +261,6 @@ print SCRIPT "echo \"Local Working Directory: \$GAUSS_SCRDIR\"\n";
 print SCRIPT "echo \"Server Directory: \$GAUSS_USER\"\n";
 print SCRIPT "echo \"Log File is: \$GAUSS_LOG\"\n";
 
-# Setup Scratch Disk
-print SCRIPT  <<SCRATCHOPT;
-
-\# Setup ulimit
-\# VMem limits are set in PBS Calls above
-\#ulimit -s unlimited
-
-
-mkdir \$GAUSS_SCRDIR
-chgrp unsw \$GAUSS_SCRDIR
-chmod 2775 \$GAUSS_SCRDIR
-
-SCRATCHOPT
 
 # Linda Options	
 if ($numNodes > 1){
@@ -233,9 +288,6 @@ print SCRIPT <<LINDA;
 date 
 time $g09exe <\$GAUSS_USER/$gaussFile &> \$GAUSS_USER/\$GAUSS_LOG 
 date
-
-\# Remove scratch directory
-rm -Rf "\$GAUSS_SCRDIR"
 
 LINDA
 
