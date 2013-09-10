@@ -72,7 +72,7 @@ my ($file,$dir,$ext) = fileparse($gaussFile, qr/\.[^.]*/);
 
 # Check Linda config exists. Needed to use SSH protcol
 if (! -f $TSNET){
-	print "\Creating Linda config file $TSNET\n";
+	print "\tCreating Linda config file $TSNET\n";
 	open CONFIG, " > $TSNET";
 	print CONFIG <<CONF;
 Tsnet.Appl.suffix: False
@@ -239,6 +239,7 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load g09
 
+export GAUSS_SCRDIR=\$TMPDIR
 export GAUSS_JOBID=\`echo \$PBS_JOBID | cut -d. -f1\`
 \#export GAUSS_SCRDIR=\"\$GAUSS_SCRDIR/\$GAUSS_JOBID\"
 export GAUSS_USER=\$PBS_O_WORKDIR
