@@ -9,7 +9,8 @@
 %define version 	D.01
 
 %define buildroot %{_topdir}/tmp/%{name}-%{version}-root
-
+%define __find_requires 	%{_tmppath}/%{name}-requires.sh
+%define _use_internal_dependency_generator 0
 
 Summary: gaussian 09 chemical simulation package with Linda
 Name: 		%{name}
@@ -22,7 +23,7 @@ Source: OPT-590N.tgz
 Vendor: University of New South Wales
 Packager: James Rudd <james.rudd@gmail.com>
 BuildRoot: %{buildroot}
-AutoReq: no
+#AutoReq: no
 #AutoReqProv: no
 BuildPreReq: chrpath
 
@@ -67,6 +68,13 @@ chown -R root:users g09
 #cd $RPM_BUILD_ROOT/gaussian/g09
 #./bsd/install
 #cd $RPM_BUILD_ROOT
+
+# Run the requirement generator, but strip out the requirements we are ignoring.
+# This is the script referenced in the __find_requires macro above.
+echo "#!/bin/sh" > %{_tmppath}/%{name}-requires.sh
+echo '/usr/lib/rpm/rpmdeps --requires | egrep -v "^(perl\()"' >> %{_tmppath}/%{name}-requires.sh
+#echo '/usr/lib/rpm/rpmdeps --requires | egrep -v "^(perl\(Data::Dumper\))$"' >> %{_tmppath}/%{name}-requires.sh
+chmod 0700 %{_tmppath}/%{name}-requires.sh
  
 
 %post
@@ -83,7 +91,7 @@ chown -R root:users $RPM_BUILD_ROOT/gaussian/g09
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
+rm -rf %{_tmppath}/%{name}-requires.sh
 
 %files
 #%defattr(-,root,users) /gaussian/g09/ 
