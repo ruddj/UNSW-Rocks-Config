@@ -7,6 +7,7 @@
 create queue core4-2216
 set queue core4-2216 queue_type = Execution
 set queue core4-2216 Priority = 40
+set queue core4-2216 kill_delay = 30
 set queue core4-2216 keep_completed = 120
 set queue core4-2216 enabled = True
 set queue core4-2216 started = True
@@ -20,6 +21,7 @@ set queue core64-6272 acl_user_enable = True
 set queue core64-6272 acl_users = dko
 set queue core64-6272 acl_users += ruddj
 set queue core64-6272 acl_users += yao
+set queue core64-6272 kill_delay = 30
 set queue core64-6272 keep_completed = 120
 set queue core64-6272 enabled = True
 set queue core64-6272 started = True
@@ -39,7 +41,9 @@ set server mail_from = adm
 set server query_other_jobs = True
 set server scheduler_iteration = 600
 set server node_check_rate = 150
-set server tcp_timeout = 6
+set server tcp_timeout = 15
+set server mom_job_sync = True
 set server allow_node_submit = True
-set server next_job_number = 100
+set server next_job_number = 319
+set server job_force_cancel_time = 1800
 set server moab_array_compatible = True
