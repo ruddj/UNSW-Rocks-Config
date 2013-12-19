@@ -47,7 +47,7 @@ my %queues = (
 	    'cpu' => 4,
 	    'par' => 1,
 	    'pqueue' => 'core4-2216',
-	    'maxmem' => 'mem=7gb,vmem=8gb',
+	    'maxmem' => 'mem=7gb,vmem=20gb',
 	    'module' => 'g09/gbin-A.02',
 	    'desc' => 'Jobs on 4 core Dell SC1435'
 	    },
