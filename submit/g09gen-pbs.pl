@@ -48,6 +48,7 @@ my %queues = (
 	    'par' => 1,
 	    'pqueue' => 'core4-2216',
 	    'maxmem' => 'mem=7gb,vmem=8gb',
+	    'module' => 'g09/gbin-A.02',
 	    'desc' => 'Jobs on 4 core Dell SC1435'
 	    },
 	'2'   =>  {
@@ -57,6 +58,7 @@ my %queues = (
 	    'par' => 1,
 	    'pqueue' => 'core64-6272',
 	    'maxmem' => 'mem=125gb,vmem=126gb',
+	    'module' => 'g09/gbin',
 	    'desc' => 'Jobs on 64 core Dell R815'
 	    }
 );
@@ -237,7 +239,7 @@ pwd
 source /etc/profile
 
 \# Loads Gaussian application directory
-module load g09
+module load $queues{$queueSelect}{'module'}
 
 export GAUSS_SCRDIR=\$TMPDIR
 export GAUSS_JOBID=\`echo \$PBS_JOBID | cut -d. -f1\`
