@@ -30,6 +30,53 @@
 <package>kernel-ml-headers</package>
  -->
 
+<!-- Mellanox Infiniband Drivers -->
+<package>mlnxofed-docs</package>
+<package>ofed-scripts</package>
+<package>libibverbs</package>
+<package>libibverbs-utils</package>
+<package>libmlx4</package>
+<package>libmlx5</package>
+<package>libibverbs-devel</package>
+<package>librdmacm</package>
+<package>librdmacm-utils</package>
+<package>librdmacm-devel</package>
+<package>libibumad</package>
+<package>libibmad</package>
+<package>mstflint</package>
+<package>mft</package>
+<package>fca</package>
+<package>knem</package>
+<package>openshmem</package>
+<package>opensm-libs</package>
+<package>mxm</package>
+<package>bupc</package>
+<package>ibacm</package>
+<package>compat-dapl</package>
+<package>compat-dapl-devel</package>
+<package>dapl</package>
+<package>dapl-devel</package>
+<package>dapl-devel-static</package>
+<package>dapl-utils</package>
+<package>infiniband-diags</package>
+<package>infiniband-diags-compat</package>
+<package>infinipath-psm</package>
+<package>ibutils2</package>
+<package>ibutils</package>
+<package>cc_mgr</package>
+<package>dump_pr</package>
+<package>ar_mgr</package>
+<package>ibdump</package>
+<package>qperf</package>
+<package>mstflint</package>
+<package>perftest</package>
+<package>libibprof</package>
+<package>mlnx-ofa_kernel</package>
+<package>mlnx-ofa_kernel-devel</package>
+<package>kernel-ib-devel</package>
+<package>kernel-ib</package>
+<package>kernel-mft</package>
+<package>rdma</package>
 
 <post>
         <!-- Insert your post installation script here. This
@@ -76,6 +123,13 @@ fi
 
 [ -f /etc/411-security/shared.key ] && rm -rf /etc/rc.d/rocksconfig.d/post-03-411get
 
+]]>
+</file>
+
+<file name="/etc/sudoers.d/reboot" perms="0440" owner="root.root">
+<![CDATA[
+## Allows local users group to reboot this system
+%users  ALL = NOPASSWD: /sbin/reboot
 ]]>
 </file>
 

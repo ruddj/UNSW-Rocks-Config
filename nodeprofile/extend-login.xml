@@ -33,6 +33,8 @@
 <package>vim</package>
 <package>vim-enhanced</package>
 <package>vim-common</package>
+<package>cmake</package>
+<package>flex</package>
 
 
 <!-- Fail 2 Ban to lockdown Login Nodes -->
