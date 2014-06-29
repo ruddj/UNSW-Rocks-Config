@@ -1,5 +1,0 @@
-#%Module1.0###########################################################
-##
-## version file for FFFTW
-##
-set ModulesVersion      "3.3.0-pgi-11.10"

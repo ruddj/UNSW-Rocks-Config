@@ -1,5 +1,0 @@
-#%Module1.0
-##
-##  The desired version of X11
-##
-set ModulesVersion "1.4.5-pgi-12.3"
