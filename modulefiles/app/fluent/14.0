@@ -7,7 +7,7 @@ proc ModulesHelp { } {
 }
 
 set base_path /share/apps/opt/ansys
-set version   14
+set version   14.0
 
 module-whatis "Setup FLUENT $version"
 

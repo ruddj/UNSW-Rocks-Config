@@ -1,0 +1,146 @@
+#%Module2014#####################################################################
+
+proc ModulesHelp { } {
+    global helpmsg
+    puts stderr "\t$helpmsg\n"
+}
+
+
+#
+# 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
+#
+set version 2014
+set major X
+set minor X
+
+#
+# 2. change 'pgihome' to base directory: /usr/pgi, /opt/pgi, ...
+#
+set pgihome /share/apps/opt/pgi
+
+#
+# 3. if you want to use exclusively 32-bit compilers
+#        set target linux86
+#    if you want to use exclusively 64-bit compilers
+#        set target linux86-64
+#    if you want the target to depend on the host
+#    use the following code
+#        set f [ exec arch ]
+#        if { $f == "x86_64" } {
+#            set target linux86-64
+#        } else {
+#            set target linux86
+#        }
+
+set bits [ exec uname -m ]
+set kern [ exec uname -s ]
+if { $kern == "Linux" } {
+  if { $bits == "x86_64" } {
+    set target linux86-64
+  } else {
+    set target linux86
+  }
+} elseif { $kern == "Darwin" } {
+  if { $bits == "x86_64" } {
+    set target osx86-64
+  } else {
+    set target osx86
+  }
+}
+
+set pgidir $pgihome/$target/$version
+
+if [ file isdirectory $pgidir/bin ] {
+    module-whatis "Changes the PGI home directory to $target $version"
+    prepend-path PGROUPD_LICENSE_FILE 27102@licence.eng.unsw.edu.au
+    set relnotesfile "pgirnXX.pdf"
+    set installfile "pgiinstallXX.pdf"
+    set userguidefile "pgiXug.pdf"
+    set compreffile "pgiXref.pdf"
+    set debugrnfile "pgdbgrnXX.pdf"
+    set debuginstfile "pgdbginstallXX.pdf"
+    set debugugfile "pgdbgXug.pdf"
+    set profugfile "pgprofXug.pdf"
+    if { $minor < 10 } {
+      set rnstr "PGI $version Release Notes                  $relnotesfile"
+      set igstr "PGI $version Installation Guide             $installfile"
+    } else {
+      set rnstr "PGI $version Release Notes                 $relnotesfile"
+      set igstr "PGI $version Installation Guide            $installfile"
+    }
+    set helpmsg "
+Purpose
+-------
+This module file defines the system paths and environment variables
+needed to use the PGI Compilers and Tools version $version.  The available
+compilers are pgcc, pgCC, pgcpp, pgc++, pgf77, pgf90, pgf95, and pgfortran.
+The available tools are pgdbg, pgprof, and pgcollect.
+
+Product Description
+-------------------
+PGI compilers and tools for 64-bit x64 and 32-bit x86 processor-based
+workstations or servers with or without GPU accelerators.  PGI Fortran 2003,
+C99 and gnu-compatible C++ compilers support OpenMP 3.1 and OpenACC.  PGI
+tools support OpenMP and MPI debugging and profiling.  PGI products are
+available on Linux, OS X and Windows.
+
+Dependencies
+------------
+None.
+
+Documentation
+-------------
+  Documentation for PGI $version is available in $pgidir/doc/
+  $rnstr
+  $igstr
+  PGI User's Guide                        $userguidefile
+  PGI Compiler Reference                  $compreffile
+  PGI Fortran Reference                   pgifortref.pdf
+  PGI CUDA Fortran Guide                  pgicudaforug.pdf
+  PGI OpenACC Getting Started Guide       openACC_gs.pdf
+  PGI PGDBG Debugger Release Notes        $debugrnfile
+  PGI PGDBG Debugger Installation Guide   $debuginstfile
+  PGI PGDBG Debugger Guide                $debugugfile
+  PGI PGPROF Profiler Guide               $profugfile
+
+Additional PGI Resources
+------------------------
+  General product Information             http://www.pgroup.com/
+  License Sales and Renewals              sales@pgroup.com
+  Support Options                         http://www.pgroup.com/support/
+  User Forum                              http://www.pgroup.com/userforum/
+"
+
+    setenv PGI $pgihome
+    setenv CC $pgidir/bin/pgcc
+    setenv FC $pgidir/bin/pgfortran
+    setenv F90 $pgidir/bin/pgf90
+    setenv F77 $pgidir/bin/pgf77
+    setenv CPP $pgidir/bin/pgprepro
+    setenv CXX $pgidir/bin/pgcpp
+    prepend-path PATH $pgidir/bin
+    prepend-path MANPATH $pgidir/man
+    if [ file isdirectory $pgidir/libso ] {
+      if { $kern == "Darwin" } {
+        prepend-path DYLD_LIBRARY_PATH $pgidir/lib:$pgidir/libso
+      } elseif { $kern == "Linux" } {
+        prepend-path LD_LIBRARY_PATH $pgidir/lib:$pgidir/libso
+      }
+    } else {
+      if { $kern == "Darwin" } {
+        prepend-path DYLD_LIBRARY_PATH $pgidir/lib
+      } elseif { $kern == "Linux" } {
+        prepend-path LD_LIBRARY_PATH $pgidir/lib
+      }
+    }
+} else {
+    module-whatis "PGI $target $version not installed"
+    set helpmsg "PGI $target $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr "PGI $target $version not installed on [uname nodename]"
+    }
+}
+
+# Only allow one instance of PGI compilers to load
+conflict pgi

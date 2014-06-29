@@ -7,11 +7,12 @@ proc ModulesHelp { } {
 }
 
 conflict pgi
+conflict gcc
 
 #
 # 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
 #
-set     version     4.7.2 
+set     version     4.6.3 
 #
 # 2. change 'gcchome' to base directory: /usr/gcc, /opt/gcc, ...
 #
@@ -27,10 +28,10 @@ if [ file isdirectory $gccdir/bin ] {
     setenv GCC $gcchome
     setenv GCCDIR $gccdir
     # Set as default compiler
-    setenv           COMPILER gcc47
-    setenv           CC gcc47
-    setenv           FC gfortran47
-    setenv           CXX g++47
+    setenv           COMPILER gcc
+    setenv           CC gcc
+    setenv           FC gfortran
+    setenv           CXX g++
     prepend-path     C_INCLUDE_PATH  $gccdir/include
     prepend-path     INCLUDE         $gccdir/include
     prepend-path     PATH            $gccdir/bin

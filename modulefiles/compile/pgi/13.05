@@ -11,7 +11,7 @@ conflict pgi
 #
 # 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
 #
-set     version     12.10 
+set     version     13.5 
 #
 # 2. change 'pgihome' to base directory: /usr/pgi, /opt/pgi, ...
 #

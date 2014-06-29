@@ -7,10 +7,12 @@ proc ModulesHelp { } {
 }
 
 set base_path /share/apps/opt/ansys
-set version   13.0
+set version   15.0
 
 module-whatis "Setup FLUENT $version"
 
 set path $base_path/$version
 
-prepend-path PATH $path/v130/fluent/bin
+prepend-path PATH $path/v150/fluent/bin
+
+#setenv     FLUENTLM_LICENSE_FILE  2325@leonardi.eng.unsw.edu.au
