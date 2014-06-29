@@ -21,9 +21,11 @@ for x in user_string:
 print '\nTrying to change LCD string on '+user_string+'...'
 
 #return_val = os.system('/usr/sbin/ipmitool -H '+sp_hostname+' -I lan -U root raw 0x6 0x58 193 0 0 '+str(len(user_string))+' '+hex_string)
-return_val = os.system('/usr/bin/ipmitool raw 0x6 0x58 193 0 0 '+str(len(user_string))+' '+hex_string)
+# return_val = os.system('/usr/bin/ipmitool raw 0x6 0x58 193 0 0 '+str(len(user_string))+' '+hex_string)
 
-print 'ipmitool raw 0x6 0x58 193 0 0 '+str(len(user_string))+' '+hex_string
+return_val = os.system('/usr/bin/ipmitool delloem lcd set mode userdefined user_string')
+
+#print 'ipmitool raw 0x6 0x58 193 0 0 '+str(len(user_string))+' '+hex_string
 
 if (return_val == 0):
 	print 'LCD string changed successfully.\n'
@@ -33,4 +35,4 @@ else:
 
 # this function supposedly sets the user string to show on the LCD, but never got it to work
 # this can be changed from the front of the box anyway
-os.system('/usr/bin/ipmitool raw 0x6 0x58 194 0')
+#os.system('/usr/bin/ipmitool raw 0x6 0x58 194 0')
