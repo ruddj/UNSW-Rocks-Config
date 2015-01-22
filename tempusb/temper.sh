@@ -8,7 +8,10 @@
 # Temperatures
 WARNTEMP=30;
 HIGHTEMP=35;
-DELTATEMP="1.0"; # Used for repeat warning email due to rapid temperature rise.
+DELTATEMP="2.0"; # Used to trigger warning email due to rapid temperature rise.
+
+# Calibration, How much should be added to value? Can be negative.
+MODTEMP=0.0
 
 # Commands
 SHUTDOWNCMD="echo Shutdown"
@@ -24,7 +27,6 @@ umask 0033
 if [[  ! -f ${PCSENSORS} ]] ; then
    echo "${PCSENSORS} not found";
    echo "Error: Could not find ${PCSENSORS}" | mailx -s "PC Sensor program missing on $HOSTNAME" $MAILREPORT
-   
    exit 1;
 fi
 
@@ -44,6 +46,7 @@ echo "# Temperature Monitoring Status Files" > ${CHECKFILE}
 
 # Check program returns real value
 tempReturn=$(${PCSENSORS} -m);
+returnValue=$?
 
 # Check sensor connected 
 if [[ ${tempReturn} == *"Exiting"* ]] ; then
@@ -56,13 +59,14 @@ if [[ ${tempReturn} == *"Exiting"* ]] ; then
 	fi
 	echo "NOPROBEEMAIL=sent" >> ${CHECKFILE} 
 	exit 3;
-elif [[ ${tempReturn} == *"failed"* ]] ; then
+elif [[ $returnValue > 0 || ${tempReturn} == *"failed"* ]] ; then
 	# USB interrupt read: Resource temporarily unavailable \n Fatal error> USB read failed
+	# Exit error 17
 	
 	# Could not read sensor. Wait until next cycle and if still problem send email.
 	echo "PROBEFAILED=1" >> ${CHECKFILE} 
 	
-	if [[ -n "${PROBEFAILED}" ]] ; then
+	if [[ ${PROBEFAILED} -ge 1 ]] ; then
 		# Check if message already sent	
 		if [[ -z $PROBEFAILEDEMAIL ]] ; then
 			# Send message about error sensor
@@ -74,6 +78,7 @@ elif [[ ${tempReturn} == *"failed"* ]] ; then
 fi
 
 temp=$(echo ${tempReturn} | cut -f1 -d' ' )
+temp=$( echo "${temp} + ${MODTEMP} " | bc )
 
 echo "PREVTEMP=${temp}" >> ${CHECKFILE} 
 
