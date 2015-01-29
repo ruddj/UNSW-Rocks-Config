@@ -15,7 +15,9 @@ MODTEMP=0.0
 
 # Commands
 SHUTDOWNCMD="echo Shutdown"
-PCSENSORS="/home/ruddj/UNSW-Rocks-Config/tempusb/pcsensor-1.0.0/pcsensor"
+#SHUTDOWNCMD="rocks run host command='/sbin/poweroff' managed=true x11=false collate=true"
+#PCSENSORS="/home/ruddj/UNSW-Rocks-Config/tempusb/pcsensor-1.0.0/pcsensor"
+PCSENSORS="/opt/temper/bin/pcsensor"
 MAILREPORT="james.rudd@unsw.edu.au"
 
 # Data Store

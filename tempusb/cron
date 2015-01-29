@@ -1,0 +1,2 @@
+# Autocheck temperature every minute
+* * * * * root /opt/temper/temper.sh > /dev/null 2>&1
