@@ -1,7 +1,7 @@
 # Gaussian RPM Build
 # $Id: gaussian09-A.02.spec 52 2010-05-21 06:57:31Z ruddj $
 # Build Command (Build root due to low space on /var)
-# rpmbuild -bb --target x86_64 --buildroot ~ruddj/redhat/tmp/gaussian09-root/ SPECS/gaussian09-A.02.spec
+# rpmbuild -bb --target x86_64 --buildroot ~ruddj/redhat/tmp/gaussian09-root/ SPECS/gaussian09-D.01.spec
 
 %define _topdir	 	/home/ruddj/redhat
 %define name		gaussian09 
@@ -19,13 +19,13 @@ Release: 	%{release}
 License: Commercial
 Group: Applications/Engineering
 URL: http://www.gaussian.com/
-Source: OPT-590N.tgz
+Source: E64-590N.tgz
 Vendor: University of New South Wales
 Packager: James Rudd <james.rudd@gmail.com>
 BuildRoot: %{buildroot}
 #AutoReq: no
 #AutoReqProv: no
-BuildPreReq: chrpath
+BuildRequires: chrpath
 
 
 %description
@@ -47,7 +47,7 @@ mkdir -p $RPM_BUILD_ROOT/gaussian
 cd $RPM_BUILD_ROOT/gaussian
 #cat /usr/src/redhat/SOURCES/gaussian03-D.01.taz | zcat | tar xvf -
 #gunzip -c /mnt/gaussCD/G09Bin/tar/OPT-920N.tgz | tar xvf -
-tar xzvf /home/ruddj/install/g09/OPT-590N.tgz 
+tar xzvf /home/ruddj/install/gaussian/E64-590N.tgz
 
 #cleanup perl statments
 sed -i -s 's/\/usr\/local\/bin\/perl/\/usr\/bin\/perl/' $RPM_BUILD_ROOT/gaussian/g09/bsd/*
