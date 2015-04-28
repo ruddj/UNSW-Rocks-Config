@@ -2,4 +2,4 @@
 ##
 ## version file for FFFTW
 ##
-set ModulesVersion      "3.3.0-pgi-11.10"
+set ModulesVersion      "0.2.6-pgi-13.04"
