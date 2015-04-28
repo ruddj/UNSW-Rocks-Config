@@ -11,27 +11,27 @@ proc ModulesHelp { } {
 conflict mpich
 conflict openmpi
 
-if { ! [ is-loaded pgi ] } {
-    module load "pgi/11.8"
-}
-
-
 #
 # 1. change 'version' string to appropriate version number: 1.3.1, ...
 #
-set     version      1.4.3
+set     version      1.6.4
 #
 # 2. change 'modhome' to base directory: /usr/vasp, /opt/vasp, ...
 #
-set	modhome      /share/apps/openmpi
+set	modhome     /share/apps/mpi/openmpi 
 
 #
 # 3. change 'cpp' to compiler: pgi, intel, ...
 #
 set	cpp      pgi
-set	cppver	 11.8 
+set	cppver	 13.04
 
-set moddir $modhome/$version-$cpp-$cppver
+if { ! [ is-loaded pgi ] } {
+    module load "$cpp/$cppver"
+}
+
+
+set moddir $modhome/$version-$cpp-$cppver-bd
 
 
 if [ file isdirectory $moddir/bin ] {

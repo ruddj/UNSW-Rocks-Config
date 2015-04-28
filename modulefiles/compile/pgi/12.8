@@ -11,7 +11,7 @@ conflict pgi
 #
 # 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
 #
-set     version      10.2
+set     version     12.8 
 #
 # 2. change 'pgihome' to base directory: /usr/pgi, /opt/pgi, ...
 #
@@ -41,7 +41,7 @@ if [ file isdirectory $pgidir/bin ] {
     # bring in new version
     setenv PGI $pgihome
     setenv PGIDIR $pgidir
-    #setenv LM_LICENSE_FILE $pgihome/license.dat
+    setenv LM_LICENSE_FILE 27000@129.94.216.251
     # Set as default compiler
     setenv FC pgf77
     setenv F90 pgf90
@@ -51,7 +51,8 @@ if [ file isdirectory $pgidir/bin ] {
 
 
     prepend-path PATH $pgidir/bin
-    prepend-path MANPATH :$pgidir/man  
+    prepend-path LD_LIBRARY_PATH $pgidir/libso
+    prepend-path MANPATH $pgidir/man  
     
 } else {
     module-whatis	"PGI $target $version not installed"
