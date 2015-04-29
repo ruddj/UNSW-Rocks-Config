@@ -143,13 +143,13 @@ else {
 	open CONFIG, " > $CONFIGFILE";
 	print CONFIG <<CONF;
 #Following sets Slurm Options
-#EMAILNOTIFY=abe 	# Notify actions for email
+#EMAILNOTIFY=ALL 	# Notify actions for email
 #EMAIL=me\@unsw.edu.au	# Email address to send to
 
 #Following sets options inside Gaussian file
 #MEM=20gb 		# Set the memory / CPU
 #MEMOD=0 		# Overide the memory value
-PROCSHARED=48		# Use this many shared processors in Gaussian File
+PROCSHARED=40		# Use this many shared processors in Gaussian File
 PROCSHAREDOD=1		# Overide the number of shared CPU value
 
 CONF
@@ -237,8 +237,7 @@ if ($EMAIL){
 print SCRIPT "\# Notify these e-mail addresses.\n",
 	"\#SBATCH --mail-user=$EMAIL\n",
 	"\# Define mail notification events.\n",
-	"\# [e]nd, [b]eginning, [a]bort\n",
-	"\#SBATCH --mail-type=ALL\n",
+	"\#SBATCH --mail-type=$EMAILNOTIFY\n",
 }
 
 # Gauss Options
@@ -259,6 +258,7 @@ export GAUSS_JOBID=\`echo \$SLURM_JOB_ID | cut -d. -f1\`
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
 export g09error=""
+export OMP_NUM_THREADS=1
 GAOPT
 
 my $g09exe="g09";
@@ -283,14 +283,13 @@ if ($numNodes > 1){
 	print SCRIPT <<LINDA;
 
 \# Generate Nodes File
-echo \$SLURM_JOB_NODELIST | sort | uniq >  \$GAUSS_SCRDIR/.nodes.\$GAUSS_JOBID
-export GAUSS_LFLAGS=\"-v -n $lindaNodes -nodefile \$GAUSS_SCRDIR/.nodes.\$GAUSS_JOBID\"
+LINDA_NODE_FILE=\$GAUSS_SCRDIR/.nodes.\$GAUSS_JOBID
+echo -n "Machines: "
+srun hostname -s | sort -u | tee \$LINDA_NODE_FILE
+export GAUSS_LFLAGS=\"-v -n $lindaNodes -nodefile \$LINDA_NODE_FILE\"
 
 \# Linda Environment settings
 export GAUSS_EXEDIR=\"\$GAUSS_LEXEDIR:\$GAUSS_EXEDIR\"
-
-UNIQNODES=\`echo \$SLURM_JOB_NODELIST|sort|uniq|tr '\\n' ' ' \`
-echo "Machines: \$UNIQNODES"
 
 LINDA
 
