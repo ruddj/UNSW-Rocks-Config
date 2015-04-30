@@ -12,7 +12,7 @@
 use strict; use warnings;
 use File::Basename;
 
-die "Usage: g09gen GaussFileName [NumNodes]" unless (@ARGV >= 1);
+die "Usage: $0 GaussFileName [NumNodes]" unless (@ARGV >= 1);
 print "Slurm submission script generation\n";
 
 sub CheckSettings($); 
@@ -255,7 +255,6 @@ export GAUSS_SCRDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID\"
 export GAUSS_JOBID=\$SLURM_JOB_ID
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
-export g09error=""
 export OMP_NUM_THREADS=1
 GAOPT
 
@@ -310,7 +309,7 @@ time $g09exe <\$GAUSS_USER/$gaussFile &> \$GAUSS_USER/\$GAUSS_LOG
 date
 
 \# Clean up scratch
-rm -rf \$GAUSS_SCRDIR
+srun --ntasks-per-node=1 rm -rf \$GAUSS_SCRDIR
 
 GAUSSPROG
 
@@ -318,7 +317,7 @@ GAUSSPROG
 # Manual Email
 print SCRIPT "\n\# Email finish report\n",
 	'/usr/bin/perl -e "print \"Your job $GAUSS_JOBID in queue $SLURM_JOB_PARTITION has finished.\n', 
-	"$gaussFile in folder \$GAUSS_USER completed at `date`\\n\$g09error\\n\\\",",
+	"$gaussFile in folder \$GAUSS_USER completed at `date`\\n\\\",",
 	"\\\`tail -10 \$GAUSS_LOG\\\`, \\\"\\n",
 	"\\\";\" \\\n| /bin/mail -s \"Job \$GAUSS_JOBID Completed\" $EMAIL",
 	"\n\n";
