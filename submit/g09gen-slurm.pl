@@ -253,7 +253,7 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load $queues{$queueSelect}{'module'}
 
-export GAUSS_SCRDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID
+export GAUSS_SCRDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID\"
 export GAUSS_JOBID=\$SLURM_JOB_ID
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
@@ -268,28 +268,34 @@ my $gaussLog=$gaussFile;
 $gaussLog =~ s/\.com$//;
 print SCRIPT "export GAUSS_LOG=\"$gaussLog-\${GAUSS_JOBID}.log\" \n";
 
-
 #Echo controlling PC
-print SCRIPT "\necho -n \"Master Process is on: \"\n", "hostname\n";
-print SCRIPT "\necho -n \"Machine details are: \"\n", "uname -a\n";
-print SCRIPT "echo \"Local Working Directory: \$GAUSS_SCRDIR\"\n";
-print SCRIPT "echo \"Server Directory: \$GAUSS_USER\"\n";
-print SCRIPT "echo \"Log File is: \$GAUSS_LOG\"\n";
+print SCRIPT <<CONFIGENVIRO;
+echo -n "Master Process is on: "
+hostname
 
+echo -n "Machine details are: "
+uname -a
+echo "Local Working Directory: \$GAUSS_SCRDIR"
+echo "Server Directory: \$GAUSS_USER"
+echo "Log File is: \$GAUSS_LOG"
+
+echo "Creating scratch directory on nodes"
+srun --ntasks-per-node=1 mkdir -p \$GAUSS_SCRDIR
+srun --ntasks-per-node=1 chgrp users \$GAUSS_SCRDIR 
+srun --ntasks-per-node=1 chmod 2775 \$GAUSS_SCRDIR
+
+CONFIGENVIRO
 
 # Linda Options	
 if ($numNodes > 1){
 	my $lindaNodes=$numNodes-1;
 	print SCRIPT <<LINDA;
-	
-\# Create scratch directories on nodes using srun
-echo "Creating scratch directory on nodes"
-srun "mkdir \$GAUSS_SCRDIR ; chgrp users \$GAUSS_SCRDIR ; chmod 2775 \$GAUSS_SCRDIR"
 
 \# Generate Nodes File
 LINDA_NODE_FILE=\$GAUSS_SCRDIR/.nodes.\$GAUSS_JOBID
-echo -n "Machines: "
-srun hostname -s | sort -u | tee \$LINDA_NODE_FILE
+echo "Machines: \$SLURM_NODELIST "
+scontrol show hostnames \$SLURM_NODELIST | sort -u > \$LINDA_NODE_FILE
+
 export GAUSS_LFLAGS=\"-v -n $lindaNodes -nodefile \$LINDA_NODE_FILE\"
 
 \# Linda Environment settings
@@ -298,10 +304,6 @@ export GAUSS_EXEDIR=\"\$GAUSS_LEXEDIR:\$GAUSS_EXEDIR\"
 LINDA
 
 } 
-else {
-	print SCRIPT "mkdir \$GAUSS_SCRDIR ; chgrp users \$GAUSS_SCRDIR ; chmod 2775 \$GAUSS_SCRDIR";
-}
-
 
 print SCRIPT <<GAUSSPROG;
 \# Main Program Run
