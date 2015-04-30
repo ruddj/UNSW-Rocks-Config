@@ -244,8 +244,6 @@ print SCRIPT "\# Notify these e-mail addresses.\n",
 # Gauss Options
 
 print SCRIPT  <<GAOPT;
-cd \$SLURM_O_WORKDIR
-
 echo "Working directory is:"
 pwd
 source /etc/profile
@@ -310,6 +308,9 @@ print SCRIPT <<GAUSSPROG;
 date 
 time $g09exe <\$GAUSS_USER/$gaussFile &> \$GAUSS_USER/\$GAUSS_LOG 
 date
+
+\# Clean up scratch
+rm -rf \$GAUSS_SCRDIR
 
 GAUSSPROG
 
