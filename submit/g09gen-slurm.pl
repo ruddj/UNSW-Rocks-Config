@@ -6,7 +6,7 @@
 # gaussian file
 #
 # Written by James Rudd, james.rudd@gmail.com
-# 20061216
+# 2015-04-30
 # Tracking now done by GIT
 ########################################
 use strict; use warnings;
@@ -20,9 +20,10 @@ sub CheckSettings($);
 MAIN:
 
 #set defaults or load in file
+my $gScratch="/state/partition1"; # or "\$TMPDIR"
 my $home=`echo \$HOME`;
 chomp($home);
-my $CONFIGFILE="$home/.G03SGE";
+my $CONFIGFILE="$home/.G09SLURM";
 my $TSNET="$home/.tsnet.config";
 my $gaussFile=$ARGV[0];
 my $numNodes = 1;
@@ -30,11 +31,11 @@ $numNodes=$ARGV[1] if (@ARGV >= 2);
 
 my $MEM="400MB";
 my $MEMOD=0; #overide value
-my $PROCSHARED=48; # how many processors for each PC
+my $PROCSHARED=40; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
-my $EMAILNOTIFY="abe";
-my $EMAIL="dirk.koenig\@unsw.edu.au";
+my $EMAILNOTIFY="ALL";
+my $EMAIL="me\@unsw.edu.au";
 
 # Queues
 
@@ -252,8 +253,9 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load $queues{$queueSelect}{'module'}
 
-export GAUSS_SCRDIR=\$TMPDIR
+export GAUSS_SCRDIR=\"$gScratch/\$USER.$SLURM_JOBID
 export GAUSS_JOBID=\`echo \$SLURM_JOB_ID | cut -d. -f1\`
+export GAUSS_JOBID=$SLURM_JOBID
 \#export GAUSS_SCRDIR=\"\$GAUSS_SCRDIR/\$GAUSS_JOBID\"
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
@@ -281,6 +283,10 @@ print SCRIPT "echo \"Log File is: \$GAUSS_LOG\"\n";
 if ($numNodes > 1){
 	my $lindaNodes=$numNodes-1;
 	print SCRIPT <<LINDA;
+	
+\# Create scratch directories on nodes using srun
+echo "Creating scratch directory on nodes"
+srun "mkdir \$GAUSS_SCRDIR ; chgrp users \$GAUSS_SCRDIR ; chmod 2775 \$GAUSS_SCRDIR"
 
 \# Generate Nodes File
 LINDA_NODE_FILE=\$GAUSS_SCRDIR/.nodes.\$GAUSS_JOBID
@@ -294,21 +300,21 @@ export GAUSS_EXEDIR=\"\$GAUSS_LEXEDIR:\$GAUSS_EXEDIR\"
 LINDA
 
 } 
+else {
+	print SCRIPT "mkdir \$GAUSS_SCRDIR ; chgrp users \$GAUSS_SCRDIR ; chmod 2775 \$GAUSS_SCRDIR";
+}
 
 
-
-print SCRIPT <<LINDA;
+print SCRIPT <<GAUSSPROG;
 \# Main Program Run
 date 
 time $g09exe <\$GAUSS_USER/$gaussFile &> \$GAUSS_USER/\$GAUSS_LOG 
 date
 
-LINDA
+GAUSSPROG
 
 
 # Manual Email
-# Am not receiving emails sent through nodes using following
-
 print SCRIPT "\n\# Email finish report\n",
 	'/usr/bin/perl -e "print \"Your job $GAUSS_JOBID in queue $SLURM_JOB_PARTITION has finished.\n', 
 	"$gaussFile in folder \$GAUSS_USER completed at `date`\\n\$g09error\\n\\\",",
@@ -343,7 +349,7 @@ for (; $lineNum < @GaussIn; $lineNum++){
 
 close GAUSSCOM;
 
-print "Completed SGE preperation\n";
+print "Completed Slurm preperation\n";
 
 
 exit(0);
