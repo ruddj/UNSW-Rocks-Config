@@ -253,10 +253,8 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load $queues{$queueSelect}{'module'}
 
-export GAUSS_SCRDIR=\"$gScratch/\$USER.$SLURM_JOBID
-export GAUSS_JOBID=\`echo \$SLURM_JOB_ID | cut -d. -f1\`
-export GAUSS_JOBID=$SLURM_JOBID
-\#export GAUSS_SCRDIR=\"\$GAUSS_SCRDIR/\$GAUSS_JOBID\"
+export GAUSS_SCRDIR=\"$gScratch/\$USER.$SLURM_JOB_ID
+export GAUSS_JOBID=$SLURM_JOB_ID
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
 export g09error=""
