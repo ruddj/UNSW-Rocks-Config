@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 ########################################
-# Perl script for generating Slurm submission scripts
+# Perl script for generating MPI submission scripts
 #
-# Generates Slurm settings and sets defaults in 
-# gaussian file
+# Generates Slurm settings submit file for MPI 
+#  based on program number of procs given.
 #
 # Written by James Rudd, james.rudd@gmail.com
 # 2015-04-30
@@ -12,8 +12,8 @@
 use strict; use warnings;
 use File::Basename;
 
-die "Usage: $0 GaussFileName [NumNodes]" unless (@ARGV >= 1);
-print "Slurm submission script generation\n";
+die "Usage: $0 program [NumNodes]\ne.g. $0 vasp.g 2\n" unless (@ARGV >= 1);
+print "MPI submission script generation\n";
 
 sub CheckSettings($); 
 
@@ -23,14 +23,12 @@ MAIN:
 my $gScratch="/state/partition1"; # or "\$TMPDIR"
 my $home=`echo \$HOME`;
 chomp($home);
-my $CONFIGFILE="$home/.G09SLURM";
-my $TSNET="$home/.tsnet.config";
-my $gaussFile=$ARGV[0];
+my $CONFIGFILE="$home/.MPISLURM";
+
+my $file=$ARGV[0];
 my $numNodes = 1;
 $numNodes=$ARGV[1] if (@ARGV >= 2);
 
-my $MEM="400MB";
-my $MEMOD=0; #overide value
 my $PROCSHARED=40; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
@@ -48,7 +46,7 @@ my %queues = (
 	    'cpu' => 40,
 	    'par' => 0,
 	    'maxmem' => '100000',
-	    'module' => 'g09/gbin',
+	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Fast Debug Jobs on 40 core Dell FC630'
 	    },
 	'2'   =>  {
@@ -57,7 +55,7 @@ my %queues = (
 	    'cpu' => 40,
 	    'par' => 1,
 	    'maxmem' => '125000',
-	    'module' => 'g09/gbin',
+	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Small Memory Jobs on 40 core Dell FC630 w/ 128GB Ram'
 	    },
 	'3'   =>  {
@@ -66,7 +64,7 @@ my %queues = (
 	    'cpu' => 40,
 	    'par' => 1,
 	    'maxmem' => '245000',
-	    'module' => 'g09/gbin',
+	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Medium Memory Jobs on 40 core Dell FC630 w/ 256GB Ram'
 	    },
 	'4'   =>  {
@@ -75,34 +73,15 @@ my %queues = (
 	    'cpu' => 40,
 	    'par' => 1,
 	    'maxmem' => '500000',
-	    'module' => 'g09/gbin',
+	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Large Memory Jobs on 40 core Dell FC630 w/ 512GB Ram'
 	    }
 );
 
 
 # Data Checks
-die "Could not read $gaussFile\n" if (! -f $gaussFile);
 die "$numNodes is not a number\n" if ($numNodes =~ /\D/);
-$numNodes = 1 if ($numNodes <2); #Need at least 2 to use linda
-
-#get basename
-my ($file,$dir,$ext) = fileparse($gaussFile, qr/\.[^.]*/);
-
-# Check Linda config exists. Needed to use SSH protcol
-if (! -f $TSNET){
-	print "\tCreating Linda config file $TSNET\n";
-	open CONFIG, " > $TSNET";
-	print CONFIG <<CONF;
-Tsnet.Appl.suffix: False
-Tsnet.Appl.verbose: True
-Tsnet.Appl.veryverbose: False
-
-Tsnet.Node.lindarsharg: ssh
-
-CONF
-	close CONFIG;
-}
+$numNodes = 1 if ($numNodes <2); #Need at least 2 to use MPI
 
 #read in defaults
 if ( -f $CONFIGFILE){
@@ -112,10 +91,7 @@ if ( -f $CONFIGFILE){
 		chomp $line;
 		next if ($line =~ /^#/);
 		
-		if ($line =~ /^MEMOD[\s]*=[\s]*([\d]+)/i){
-			$MEMOD=$1;
-		}
-		elsif ($line =~ /^PROCSHAREDOD[\s]*=[\s]*([\d]+)/i){
+		if ($line =~ /^PROCSHAREDOD[\s]*=[\s]*([\d]+)/i){
 			$PROCSHAREDOD=$1;
 		}
 		elsif ($line =~ /^PROCSHARED[\s]*=[\s]*([\d]+)/i){
@@ -131,9 +107,6 @@ if ( -f $CONFIGFILE){
 		}
 		elsif ($line =~ /^EMAIL[\s]*=[\s]*([^\s]+)/i){ 
 			$EMAIL=$1;
-		}
-		elsif ($line =~ /^MEM[\s]*=[\s]*([\d]+[\w]*)/i){ 
-			$MEM=$1;
 		}
 		
 	}
@@ -185,7 +158,7 @@ if ($queues{$queueSelect}{'par'} ) {
 		die "$answer is not a number.";
 	}
 	$numNodes = $answer;
-	$numNodes = 1 if ($numNodes <2); #Need at least 2 to use linda
+	$numNodes = 1 if ($numNodes <2); #Need at least 2 to use MPI
 }
 else {
 
@@ -256,19 +229,14 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load $queues{$queueSelect}{'module'}
 
-export GAUSS_SCRDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID\"
+export TMPDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID\"
 export GAUSS_JOBID=\$SLURM_JOB_ID
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
+export g09error=""
 export OMP_NUM_THREADS=1
 GAOPT
 
-my $g09exe="g09";
-
-my $gaussLog=$gaussFile;
-#$gaussLog =~ s/\.com$/.log/;
-$gaussLog =~ s/\.com$//;
-print SCRIPT "export GAUSS_LOG=\"$gaussLog-\${GAUSS_JOBID}.log\" \n";
 
 #Echo controlling PC
 print SCRIPT <<CONFIGENVIRO;
@@ -277,145 +245,50 @@ hostname
 
 echo -n "Machine details are: "
 uname -a
-echo "Local Working Directory: \$GAUSS_SCRDIR"
-echo "Server Directory: \$GAUSS_USER"
-echo "Log File is: \$GAUSS_LOG"
+echo "Local Working Directory: \$TMPDIR"
+
 
 echo "Creating scratch directory on nodes"
-srun --ntasks-per-node=1 mkdir -p \$GAUSS_SCRDIR
-srun --ntasks-per-node=1 chgrp users \$GAUSS_SCRDIR 
-srun --ntasks-per-node=1 chmod 2775 \$GAUSS_SCRDIR
+srun --ntasks-per-node=1 mkdir -p \$TMPDIR
+srun --ntasks-per-node=1 chgrp users \$TMPDIR 
+srun --ntasks-per-node=1 chmod 2775 \$TMPDIR
 
 CONFIGENVIRO
 
 # Linda Options	
 if ($numNodes > 1){
-	my $lindaNodes=$numNodes-1;
-	print SCRIPT <<LINDA;
 
-\# Generate Nodes File
-LINDA_NODE_FILE=\$GAUSS_SCRDIR/.nodes.\$GAUSS_JOBID
+	print SCRIPT <<MPI;
+\# Show Nodes List
+
 echo "Machines: \$SLURM_NODELIST "
-scontrol show hostnames \$SLURM_NODELIST | sort -u > \$LINDA_NODE_FILE
+export NODES=\$(scontrol show hostnames \$SLURM_NODELIST | sort -u)
 
-export GAUSS_LFLAGS=\"-v -n $lindaNodes -nodefile \$LINDA_NODE_FILE\"
 
-\# Linda Environment settings
-export GAUSS_EXEDIR=\"\$GAUSS_LEXEDIR:\$GAUSS_EXEDIR\"
-
-LINDA
+MPI
 
 } 
 
-print SCRIPT <<GAUSSPROG;
+print SCRIPT <<MPIPROG;
 \# Main Program Run
 date 
-time $g09exe <\$GAUSS_USER/$gaussFile &> \$GAUSS_USER/\$GAUSS_LOG 
+time srun $file 
 date
 
 \# Clean up scratch
-srun --ntasks-per-node=1 rm -rf \$GAUSS_SCRDIR
+srun --ntasks-per-node=1 rm -rf \$TMPDIR
 
-GAUSSPROG
+MPIPROG
 
 
 # Manual Email
 print SCRIPT "\n\# Email finish report\n",
-	'/usr/bin/perl -e "print \"Your job $GAUSS_JOBID in queue $SLURM_JOB_PARTITION has finished.\n', 
-	"$gaussFile in folder \$GAUSS_USER completed at `date`\\n\\\",",
-	"\\\`tail -10 \$GAUSS_LOG\\\`, \\\"\\n",
-	"\\\";\" \\\n| /bin/mail -s \"Job \$GAUSS_JOBID Completed\" $EMAIL",
+	'/usr/bin/perl -e "print \"Your job $SLURM_JOB_ID in queue $SLURM_JOB_PARTITION has finished.\n', 
+	"$file in folder \$SLURM_SUBMIT_DIR completed at `date`\\n\\\",",
+	"\\\";\" \\\n| /bin/mail -s \"Job \$SLURM_JOB_ID: $file   Completed\" $EMAIL",
 	"\n\n";
 	
 print SCRIPT 'echo "Finished job $GAUSS_JOBID"';
 close SCRIPT;
-# Modify gaussian .com file
-# load in file
-open GAUSSCOM, " < $gaussFile";
-my @GaussIn = <GAUSSCOM>;
-close GAUSSCOM;
-
-
-print "\tUpdating Gaussian file: $gaussFile\n";
-open GAUSSCOM, " > $gaussFile";
-
-my $lineNum = CheckSettings(0);
-
-for (; $lineNum < @GaussIn; $lineNum++){
-	my $line = $GaussIn[$lineNum];
-	# strip comments and junk
-	chomp $line;
-	if ($line =~ /--Link1--/){
-		$lineNum = CheckSettings($lineNum) -1;
-		next;
-	}
-	print GAUSSCOM $line, "\n";
-}
-
-close GAUSSCOM;
-
-print "Completed Slurm preperation\n";
-
-
-exit(0);
-
-
-################
-# Reads in settings for each link and sets defaults
-################
-sub CheckSettings($){
-
-	# need to read in settings and output if needed
-	my $count = $_[0];
-	my @settings;
-	my ($nProc,$nLinda,$nMem)=(0,0,0);
-	SETTINGS: for (;$count < @GaussIn; $count++){
-		my $line = $GaussIn[$count];
-		chomp $line;
-		if ($line =~ /^\#/){
-			# Last line begins with a #
-			#print "Start Gauss\n";	
-			last SETTINGS;
-		}
-		elsif ($line =~ /^\%nprocl[\w]*\s*=\s*([\d]+)/i){
-	 		# $nLinda = $1; # set by script
-		}
-		elsif ($line =~ /^\%NProc[\w]*[\s]*=[\s]*([\d]+)/i){	
-			$nProc = $1;	
-		}
-		elsif ($line =~ /^\%mem\s*=\s*([\d]+[\w]*)/i){
-			$nMem = $1;
-		}
-		else {
-			print GAUSSCOM $line, "\n";
-		}
-	}
-
-	#check nproc
-	if ($PROCSHAREDOD or $nProc == 0){
-		print GAUSSCOM "\%NProcShared=$PROCSHARED\n";
-	}
-	else {
-		print GAUSSCOM "\%NProcShared=$nProc\n";
-	}
-
-	# check nprocl
-	if ($nLinda){
-		print GAUSSCOM "\%NProcLinda=$nLinda\n";
-	}
-	elsif ($numNodes){
-		print GAUSSCOM "\%NProcLinda=$numNodes\n";
-	}
-
-	# check mem
-	if ($MEMOD or ($nMem eq 0)){
-		print GAUSSCOM "\%Mem=$MEM\n";		
-	}
-	else {
-		print GAUSSCOM "\%Mem=$nMem\n";
-	}
-
-	return $count;
-}
 
 
