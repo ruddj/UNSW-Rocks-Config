@@ -20,6 +20,7 @@ sub CheckSettings($);
 MAIN:
 
 #set defaults or load in file
+my $userName =  $ENV{'LOGNAME'};
 my $gScratch="/state/partition1"; # or "\$TMPDIR"
 my $home=`echo \$HOME`;
 chomp($home);
@@ -35,7 +36,7 @@ my $PROCSHARED=40; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
 my $EMAILNOTIFY="ALL";
-my $EMAIL="me\@unsw.edu.au";
+my $EMAIL="$userName\@unsw.edu.au";
 
 # Queues
 
@@ -145,7 +146,7 @@ else {
 	print CONFIG <<CONF;
 #Following sets Slurm Options
 #EMAILNOTIFY=ALL 	# Notify actions for email
-#EMAIL=me\@unsw.edu.au	# Email address to send to
+#EMAIL=$userName\@unsw.edu.au	# Email address to send to
 
 #Following sets options inside Gaussian file
 #MEM=20gb 		# Set the memory / CPU
@@ -232,7 +233,7 @@ print SCRIPT <<SLURMSET;
 \# Processor total (proc / node * \# nodes)
 \#SBATCH -n $numCores
 \# Tasks per node
-\# SBATCH --ntasks-per-node=12
+\# SBATCH --ntasks-per-node=$PROCSHARED
 \# How long will it run [[HH:]MM:]SS, use UNLIMITED for no limit
 \#SBATCH --time=8:00:00
 
