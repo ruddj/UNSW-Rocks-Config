@@ -217,7 +217,7 @@ print SCRIPT <<SLURMSET;
 \#SBATCH  --job-name="$file" 
 
 \# Set partition
-#SBATCH -p $queues{$queueSelect}{'queue'}
+\#SBATCH -p $queues{$queueSelect}{'queue'}
 
 \# Memory Requirments (Max mem=80gb,vmem=40gb)
 \# This sets a hard memory limit within the shell. 
@@ -226,10 +226,15 @@ print SCRIPT <<SLURMSET;
 \#SBATCH --mem=$queues{$queueSelect}{'maxmem'}
 \# Number of Nodes
 \#SBATCH -N $numNodes
-\# Processor per node
-\#SBATCH -n $PROCSHARED
-\# How long will it run [[HH:]MM:]SS 
-\# SBATCH --time=8:00:00
+\# use --exclusive to get the whole nodes exclusively for this job
+\# If you only need a few cores disable this and instead use -n
+\#SBATCH --exclusive
+\# Processor total (proc / node * \# nodes)
+\#SBATCH -n $numCores
+\# Tasks per node
+\# SBATCH --ntasks-per-node=12
+\# How long will it run [[HH:]MM:]SS, use UNLIMITED for no limit
+\#SBATCH --time=8:00:00
 
 SLURMSET
 
