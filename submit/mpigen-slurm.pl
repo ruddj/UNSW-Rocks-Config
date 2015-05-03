@@ -285,8 +285,8 @@ MPIPROG
 # Manual Email
 print SCRIPT "\n\# Email finish report\n",
 	'/usr/bin/perl -e "print \"Your job $SLURM_JOB_ID in queue $SLURM_JOB_PARTITION has finished.\n', 
-	"$file in folder \$SLURM_SUBMIT_DIR completed at `date`\\n\\\",",
-	"\\\";\" \\\n| /bin/mail -s \"Job \$SLURM_JOB_ID: $file   Completed\" $EMAIL",
+	"$file in folder \$SLURM_SUBMIT_DIR completed at `date`\\\"; \\\n",
+	"| /bin/mailx -s \"Job \$SLURM_JOB_ID: $file Completed\" $EMAIL",
 	"\n\n";
 	
 print SCRIPT 'echo "Finished job $GAUSS_JOBID"';
