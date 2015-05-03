@@ -1,5 +1,5 @@
 #%Module1.0###########################################################
 ##
-## version file for MPICH
+## version file for Pgi
 ##
-set ModulesVersion      "1.4.4-pgi-11.10"
+set ModulesVersion      "13.04"

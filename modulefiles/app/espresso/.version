@@ -1,5 +1,5 @@
 #%Module1.0###########################################################
 ##
-## version file for FFFTW
+## version file for Vasp
 ##
-set ModulesVersion      "0.1-pgi-11.10"
+set ModulesVersion      "5.0.3-pgi-ompi-13.04"
