@@ -273,7 +273,7 @@ MPI
 print SCRIPT <<MPIPROG;
 \# Main Program Run
 date 
-time srun $file 
+time mpirun --bind-to-core  $file 
 date
 
 \# Clean up scratch
