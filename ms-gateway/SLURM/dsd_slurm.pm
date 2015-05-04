@@ -2,7 +2,7 @@
 #
 # File: dsd_torque.pm
 #
-# Description: # Implementation of TORQUE contlrol class
+# Description: # Implementation of TORQUE control class
 #  
 # Orginator:  vadim    2002
 # 
@@ -46,14 +46,14 @@ BEGIN
     use constant QSTAT_MINIMUM_FAILED_PERIOD => (30 * 60); # ie 30 minutes
 
 #location of the queue binaries - otherwise should be in the path
-    my $bin_location; #'/usr/local/bin/';
+    my $bin_location='/usr/bin/'; #'/usr/local/bin/';
 
 
 #start the job
     sub Submit($$$$;$$)
     {
 	my $qsub = $bin_location."qsub";
-	my $cmd="torque.sh";
+	my $cmd="slurm.sh";
 	
 	my ($myself,$executable,$args,$dir,$spriority,$queue_priority) = @_;
 	my $myloc=DSD_basequeue::MyLocation($myself);
@@ -61,7 +61,7 @@ BEGIN
 
         if($DSD_defaults::dsd_isNT)
         {
-            $cmd ="torque.bat";
+            $cmd ="slurm.bat";
             if (!($executable =~ /^\"/) &&  ($executable =~ /\s/g))
             {
                 $executable = "\"$executable\"";
@@ -194,15 +194,15 @@ sub detectPBSAndVersion()
     my $ispbs = 0;
     my $version;
     ($ran, $rc) 
-	= DSD_basequeue::runAndReturnOutputs($bin_location. "pbsnodes --version",\@stdoutFile, \@stderrFile);
+	= DSD_basequeue::runAndReturnOutputs($bin_location. "sinfo --version",\@stdoutFile, \@stderrFile);
     if($ran){
 	foreach (@stdoutFile,@stderrFile){
 	    if (/PBSPro/i)
 	    {
 		return 0;
 	    }
-	    if (/version:(.*)/i){
-		($version) = "TORQUE ".$1;
+	    if (/slurm (.*)/i){
+		($version) = "SLURM ".$1;
 		$ispbs = 1;
 	    }
 	}
@@ -319,7 +319,7 @@ sub GetAvailableQueues($$;$)
     my $def_queue = GetDefaultQueue($self);
     my @names;
     push @names,$def_queue;
-    if (open(my $QSTAT, "$bin_location" . "qstat -Qf |")){
+    if (open(my $QSTAT, "$bin_location" . "qstat -Q -f |")){
 	foreach (<$QSTAT>){
 	    if(/^Queue:(.*)$/){
 		my $qn=$1;
@@ -337,17 +337,17 @@ sub GetDefaultQueue($)
     my ($myself) = @_;
     my $myloc=DSD_basequeue::MyLocation($myself);
     my $default_queue = DSD_basequeue::get_config_info_item ("default_queue","$myloc/${cfgname}.cfg");
-    if( !$default_queue && (open (my $QMGR, 'qmgr -c "list s" |')))
+    if( !$default_queue && (open (my $QMGR, 'sinfo -h | cut -f1 -d\' \' |')))
     {
 	my @lines = <$QMGR>;
 	close ($QMGR);
 	foreach my $line (@lines)
 	{
 	    $line =~ s/\s//g;
-	    my ($var,$value) = split /=/, $line;
-	    if ($var eq 'default_queue')
+		$_ = $line;
+	    if (/([^\*]+\*)/)
 	    {
-		$default_queue = $value;
+		$default_queue = $1;
 		last;
 	    }
 	}
@@ -362,17 +362,14 @@ sub GetResourceLine(){
     if (!$cpuspernode){
 	$cpuspernode=EstimateCPUperNode();
     }
-    my $line=" -l nodes=";
+    my $line=" -N ";
     my $mod=$cpu % $cpuspernode;
     my $full=($cpu-$mod)/$cpuspernode;
-    if($full && $mod){
-	$line.="$full:ppn=$cpuspernode+1:ppn=$mod";
-    }
-    elsif ($full){
-	$line.="$full:ppn=$cpuspernode";
+    if($full){
+	$line.="$full -n $cpu";
     }
     else{
-	$line.="1:ppn=$mod";
+	$line.="1 -n $cpu";
     }
     
 }
@@ -410,7 +407,9 @@ sub GetCfgValue
 
 sub CreateMachineFileCommand
 {
-    my $command="cat \$PBS_NODEFILE";
+   # my $command="cat \$PBS_NODEFILE";
+	my $command = $bin_location . "scontrol show hostnames \$SLURM_NODELIST";
+	
     return $command; 
 }
 
