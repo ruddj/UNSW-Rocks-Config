@@ -1,13 +1,13 @@
 #****************************************************************************
 #
-# File: dsd_torque.pm
+# File: dsd_slurm.pm
 #
-# Description: # Implementation of TORQUE control class
+# Description: # Implementation of SLURM control class
 #  
 # Orginator:  vadim    2002
 # 
 # Copyright (C) 2002 Accelrys, Inc., All Rights Reserved
-# Modified for torque by ap, 2009
+# Modified for slurm by JR, 2015
 #****************************************************************************
 
 use strict;
@@ -16,7 +16,7 @@ use DSD_utils;
 use DSD_errors;
 use DSD_defaults;
 
-package  dsd_torque;
+package  dsd_slurm;
 use Error qw(:try);
 
 BEGIN
@@ -33,7 +33,7 @@ BEGIN
 # errors when calling qstat for job status assuming that there is an intermittant
 # problem. To avoid real queuing failures to cause jobs to sit permanently in the
 # running state whilst in fact there has been a failure, the following two constants 
-# allow the behaviour to be tuned appropriately to a particular TORQUE installation.
+# allow the behaviour to be tuned appropriately to a particular SLURM installation.
 
 # The minimum number of times that qstat calls must fail consecutively to
 # consider failing the job. If negative, no jobs will fail. If zero, the
@@ -108,7 +108,7 @@ BEGIN
 	    print( $CMD $header);
 
 	    # Make sure that current TMPDIR env variable value is not lost
-	    # since TORQUE will supply its own suggested value - which is not 
+	    # since SLURM will supply its own suggested value - which is not 
 	    # necessarily accessible from all of the nodes in a multi-node
 	    # job (and if it were to be accessible, it would be on a non-local
 	    # drive and so not as efficient as a drive local to each node.
