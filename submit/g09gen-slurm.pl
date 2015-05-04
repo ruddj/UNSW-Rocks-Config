@@ -32,7 +32,7 @@ $numNodes=$ARGV[1] if (@ARGV >= 2);
 
 my $MEM="400MB";
 my $MEMOD=0; #overide value
-my $PROCSHARED=40; # how many processors for each PC
+my $PROCSHARED=20; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
 my $EMAILNOTIFY="ALL";
@@ -46,7 +46,7 @@ my %queues = (
 	'1' =>  {
 	    'name' => 'debug',
 	    'queue' => 'debug',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 0,
 	    'maxmem' => '100000',
 	    'module' => 'g09/gbin',
@@ -55,7 +55,7 @@ my %queues = (
 	'2'   =>  {
 	    'name' => 'Mem128',
 	    'queue' => 'Mem128',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '125000',
 	    'module' => 'g09/gbin',
@@ -64,7 +64,7 @@ my %queues = (
 	'3'   =>  {
 	    'name' => 'Mem256',
 	    'queue' => 'Mem256',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '245000',
 	    'module' => 'g09/gbin',
@@ -73,7 +73,7 @@ my %queues = (
 	'4'   =>  {
 	    'name' => 'Mem512',
 	    'queue' => 'Mem512',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '500000',
 	    'module' => 'g09/gbin',
@@ -151,7 +151,7 @@ else {
 #Following sets options inside Gaussian file
 #MEM=20gb 		# Set the memory / CPU
 #MEMOD=0 		# Overide the memory value
-PROCSHARED=40		# Use this many shared processors in Gaussian File
+PROCSHARED=20		# Use this many shared processors in Gaussian File
 PROCSHAREDOD=1		# Overide the number of shared CPU value
 
 CONF
