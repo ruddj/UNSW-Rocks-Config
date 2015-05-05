@@ -50,7 +50,7 @@ my %queues = (
 	    'par' => 0,
 	    'maxmem' => '100000',
 	    'module' => 'g09/gbin',
-	    'desc' => 'Fast Debug Jobs on 40 core Dell FC630'
+	    'desc' => 'Fast Debug Jobs on 20 core Dell FC630'
 	    },
 	'2'   =>  {
 	    'name' => 'Mem128',
@@ -59,7 +59,7 @@ my %queues = (
 	    'par' => 1,
 	    'maxmem' => '125000',
 	    'module' => 'g09/gbin',
-	    'desc' => 'Small Memory Jobs on 40 core Dell FC630 w/ 128GB Ram'
+	    'desc' => 'Small Memory Jobs on 20 core Dell FC630 w/ 128GB Ram'
 	    },
 	'3'   =>  {
 	    'name' => 'Mem256',
@@ -68,7 +68,7 @@ my %queues = (
 	    'par' => 1,
 	    'maxmem' => '245000',
 	    'module' => 'g09/gbin',
-	    'desc' => 'Medium Memory Jobs on 40 core Dell FC630 w/ 256GB Ram'
+	    'desc' => 'Medium Memory Jobs on 20 core Dell FC630 w/ 256GB Ram'
 	    },
 	'4'   =>  {
 	    'name' => 'Mem512',
@@ -77,7 +77,7 @@ my %queues = (
 	    'par' => 1,
 	    'maxmem' => '500000',
 	    'module' => 'g09/gbin',
-	    'desc' => 'Large Memory Jobs on 40 core Dell FC630 w/ 512GB Ram'
+	    'desc' => 'Large Memory Jobs on 20 core Dell FC630 w/ 512GB Ram'
 	    }
 );
 

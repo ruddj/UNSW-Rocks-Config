@@ -30,7 +30,7 @@ my $file=$ARGV[0];
 my $numNodes = 1;
 $numNodes=$ARGV[1] if (@ARGV >= 2);
 
-my $PROCSHARED=40; # how many processors for each PC
+my $PROCSHARED=20; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
 my $EMAILNOTIFY="ALL";
@@ -44,38 +44,38 @@ my %queues = (
 	'1' =>  {
 	    'name' => 'debug',
 	    'queue' => 'debug',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 0,
 	    'maxmem' => '100000',
 	    'module' => 'pgi openmpi/pgi',
-	    'desc' => 'Fast Debug Jobs on 40 core Dell FC630'
+	    'desc' => 'Fast Debug Jobs on 20 core Dell FC630'
 	    },
 	'2'   =>  {
 	    'name' => 'Mem128',
 	    'queue' => 'Mem128',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '125000',
 	    'module' => 'pgi openmpi/pgi',
-	    'desc' => 'Small Memory Jobs on 40 core Dell FC630 w/ 128GB Ram'
+	    'desc' => 'Small Memory Jobs on 20 core Dell FC630 w/ 128GB Ram'
 	    },
 	'3'   =>  {
 	    'name' => 'Mem256',
 	    'queue' => 'Mem256',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '245000',
 	    'module' => 'pgi openmpi/pgi',
-	    'desc' => 'Medium Memory Jobs on 40 core Dell FC630 w/ 256GB Ram'
+	    'desc' => 'Medium Memory Jobs on 20 core Dell FC630 w/ 256GB Ram'
 	    },
 	'4'   =>  {
 	    'name' => 'Mem512',
 	    'queue' => 'Mem512',
-	    'cpu' => 40,
+	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '500000',
 	    'module' => 'pgi openmpi/pgi',
-	    'desc' => 'Large Memory Jobs on 40 core Dell FC630 w/ 512GB Ram'
+	    'desc' => 'Large Memory Jobs on 20 core Dell FC630 w/ 512GB Ram'
 	    }
 );
 
@@ -124,7 +124,7 @@ else {
 #Following sets options inside Gaussian file
 #MEM=20gb 		# Set the memory / CPU
 #MEMOD=0 		# Overide the memory value
-PROCSHARED=40		# Use this many shared processors in Gaussian File
+PROCSHARED=20		# Use this many shared processors in Gaussian File
 PROCSHAREDOD=1		# Overide the number of shared CPU value
 
 CONF
