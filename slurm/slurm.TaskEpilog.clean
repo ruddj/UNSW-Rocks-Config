@@ -5,6 +5,7 @@ export TMPDIR=/state/partition1/$LOGNAME.$SLURM_JOB_ID
 
 if [ -d "$TMPDIR" ]; then
  /bin/rm -rf $TMPDIR
+ echo "print Deleted $SLURMD_NODENAME:$TMPDIR"
 fi
 
 exit 0

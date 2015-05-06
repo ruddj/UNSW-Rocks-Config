@@ -46,6 +46,7 @@ if [ ! -d "$SLURM_TMPDIR" ]; then
  /bin/mkdir -p $SLURM_TMPDIR
  /bin/chgrp users $SLURM_TMPDIR
  /bin/chmod 2775 $SLURM_TMPDIR
+ echo "print \$TMPDIR local temp directory created $SLURMD_NODENAME:$SLURM_TMPDIR"
 fi
 pbs_compat TMPDIR    "$SLURM_TMPDIR"
 
