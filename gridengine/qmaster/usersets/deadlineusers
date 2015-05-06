@@ -1,9 +1,0 @@
-# Version: 6.2u5
-# 
-# DO NOT MODIFY THIS FILE MANUALLY!
-# 
-name    deadlineusers
-type    ACL
-fshare  0
-oticket 0
-entries NONE

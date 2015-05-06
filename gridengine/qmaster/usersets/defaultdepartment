@@ -1,9 +1,0 @@
-# Version: 6.2u5
-# 
-# DO NOT MODIFY THIS FILE MANUALLY!
-# 
-name    defaultdepartment
-type    DEPT
-fshare  0
-oticket 0
-entries NONE
