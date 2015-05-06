@@ -78,11 +78,11 @@ BEGIN
 	
 	my $jobName = "MS_$jobid";
 
-	my $queueParams = ( (defined $queueName) ? "-q $queueName" : "" );
+	my $queueParams = ( (defined $queueName) ? "-p $queueName" : "" );
 
 	#any additional parameters ?
 	my $params = DSD_basequeue::get_config_info_item ('params', "$myloc/${cfgname}.cfg");
-	$params = " -N $jobName $params " if ($jobid);
+	$params = " --job-name=$jobName $params " if ($jobid);
 	my $cpu = DSD_utils::get_jobinfoitem('job-cpu-number', $jobid,	1); # reverse search
 
 	my $queueExtraParams = $DSD_basequeue::G_queueExtraParams;
