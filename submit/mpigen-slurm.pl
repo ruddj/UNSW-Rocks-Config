@@ -46,6 +46,7 @@ my %queues = (
 	    'cpu' => 20,
 	    'par' => 0,
 	    'maxmem' => '100000',
+		'deftime' => '00:30:00',
 	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Fast Debug Jobs on 20 core Dell FC630'
 	    },
@@ -55,6 +56,7 @@ my %queues = (
 	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '125000',
+		'deftime' => '04:00:00',
 	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Small Memory Jobs on 20 core Dell FC630 w/ 128GB Ram'
 	    },
@@ -64,6 +66,7 @@ my %queues = (
 	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '245000',
+		'deftime' => '08:00:00',
 	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Medium Memory Jobs on 20 core Dell FC630 w/ 256GB Ram'
 	    },
@@ -73,6 +76,7 @@ my %queues = (
 	    'cpu' => 20,
 	    'par' => 1,
 	    'maxmem' => '500000',
+		'deftime' => '08:00:00',
 	    'module' => 'pgi openmpi/pgi',
 	    'desc' => 'Large Memory Jobs on 20 core Dell FC630 w/ 512GB Ram'
 	    }
@@ -207,7 +211,7 @@ print SCRIPT <<SLURMSET;
 \# Tasks per node
 \# SBATCH --ntasks-per-node=$PROCSHARED
 \# How long will it run [[HH:]MM:]SS, use UNLIMITED for no limit
-\#SBATCH --time=8:00:00
+\#SBATCH --time=$queues{$queueSelect}{'deftime'} 
 
 SLURMSET
 
