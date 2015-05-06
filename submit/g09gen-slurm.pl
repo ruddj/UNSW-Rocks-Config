@@ -21,7 +21,7 @@ MAIN:
 
 #set defaults or load in file
 my $userName =  $ENV{'LOGNAME'};
-my $gScratch="/state/partition1"; # or "\$TMPDIR"
+my $gScratch="\$TMPDIR";
 my $home=`echo \$HOME`;
 chomp($home);
 my $CONFIGFILE="$home/.G09SLURM";
@@ -257,7 +257,7 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load $queues{$queueSelect}{'module'}
 
-export GAUSS_SCRDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID\"
+export GAUSS_SCRDIR=\"$gScratch\"
 export GAUSS_JOBID=\$SLURM_JOB_ID
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
@@ -281,11 +281,6 @@ uname -a
 echo "Local Working Directory: \$GAUSS_SCRDIR"
 echo "Server Directory: \$GAUSS_USER"
 echo "Log File is: \$GAUSS_LOG"
-
-echo "Creating scratch directory on nodes"
-srun --ntasks-per-node=1 mkdir -p \$GAUSS_SCRDIR
-srun --ntasks-per-node=1 chgrp users \$GAUSS_SCRDIR 
-srun --ntasks-per-node=1 chmod 2775 \$GAUSS_SCRDIR
 
 CONFIGENVIRO
 
@@ -313,9 +308,6 @@ print SCRIPT <<GAUSSPROG;
 date 
 time $g09exe <\$GAUSS_USER/$gaussFile &> \$GAUSS_USER/\$GAUSS_LOG 
 date
-
-\# Clean up scratch
-srun --ntasks-per-node=1 rm -rf \$GAUSS_SCRDIR
 
 GAUSSPROG
 

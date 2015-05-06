@@ -21,7 +21,6 @@ MAIN:
 
 #set defaults or load in file
 my $userName =  $ENV{'LOGNAME'};
-my $gScratch="/state/partition1"; # or "\$TMPDIR"
 my $home=`echo \$HOME`;
 chomp($home);
 my $CONFIGFILE="$home/.MPISLURM";
@@ -230,7 +229,6 @@ source /etc/profile
 \# Loads Gaussian application directory
 module load $queues{$queueSelect}{'module'}
 
-export TMPDIR=\"$gScratch/\$USER.\$SLURM_JOB_ID\"
 export GAUSS_JOBID=\$SLURM_JOB_ID
 export GAUSS_USER=\$SLURM_SUBMIT_DIR
 export TSNET_PATH=\$GAUSS_LEXEDIR
@@ -247,12 +245,6 @@ hostname
 echo -n "Machine details are: "
 uname -a
 echo "Local Working Directory: \$TMPDIR"
-
-
-echo "Creating scratch directory on nodes"
-srun --ntasks-per-node=1 mkdir -p \$TMPDIR
-srun --ntasks-per-node=1 chgrp users \$TMPDIR 
-srun --ntasks-per-node=1 chmod 2775 \$TMPDIR
 
 CONFIGENVIRO
 
@@ -275,9 +267,6 @@ print SCRIPT <<MPIPROG;
 date 
 time mpirun --bind-to-core  $file 
 date
-
-\# Clean up scratch
-srun --ntasks-per-node=1 rm -rf \$TMPDIR
 
 MPIPROG
 
