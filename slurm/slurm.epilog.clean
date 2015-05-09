@@ -23,7 +23,7 @@ if [ $SLURM_JOB_UID -lt 800 ] ; then
 	exit 0
 fi
 
-job_list=`${SLURM_BIN}squeue --noheader --format=%A --user=$SLURM_UID --node=localhost`
+job_list=`${SLURM_BIN}squeue --noheader --format=%A --user=$SLURM_JOB_UID --node=localhost`
 for job_id in $job_list
 do
 	job_id=`echo $job_id | cut -f1 -d_` 
@@ -35,5 +35,5 @@ done
 #
 # No other SLURM jobs, purge all remaining processes of this user
 #
-pkill -KILL -U $SLURM_UID
+pkill -KILL -U $SLURM_JOB_UID
 exit 0
