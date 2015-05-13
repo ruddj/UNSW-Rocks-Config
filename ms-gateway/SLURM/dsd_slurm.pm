@@ -323,7 +323,7 @@ sub GetAvailableQueues($$;$)
 	foreach (<$QSTAT>){
 	    if(/^Queue:(.*)$/){
 		my $qn=$1;
-		$qn=~s/ //g;		
+		$qn=~s/^\s+|\s+$//g;		
 		push @names, $qn if $qn ne $def_queue;
 	    }
 	}
@@ -345,7 +345,7 @@ sub GetDefaultQueue($)
 	{
 	    $line =~ s/\s//g;
 		$_ = $line;
-	    if (/([^\*]+\*)/)
+	    if (/([^\*]+)\*/)
 	    {
 		$default_queue = $1;
 		last;
