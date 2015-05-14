@@ -52,7 +52,7 @@ BEGIN
 #start the job
     sub Submit($$$$;$$)
     {
-	my $qsub = $bin_location."qsub";
+	my $qsub = $bin_location."sbatch";
 	my $cmd="slurm.sh";
 	
 	my ($myself,$executable,$args,$dir,$spriority,$queue_priority) = @_;
@@ -75,6 +75,7 @@ BEGIN
 
 	my $queueName = $DSD_basequeue::G_working_queue;
 	$queueName = GetDefaultQueue($myself) unless $queueName;
+
 	
 	my $jobName = "MS_$jobid";
 
@@ -83,6 +84,7 @@ BEGIN
 	#any additional parameters ?
 	my $params = DSD_basequeue::get_config_info_item ('params', "$myloc/${cfgname}.cfg");
 	$params = " --job-name=$jobName $params " if ($jobid);
+	my $module = DSD_basequeue::get_config_info_item ('module', "$myloc/${cfgname}.cfg");
 	my $cpu = DSD_utils::get_jobinfoitem('job-cpu-number', $jobid,	1); # reverse search
 
 	my $queueExtraParams = $DSD_basequeue::G_queueExtraParams;
@@ -129,12 +131,16 @@ BEGIN
                     print( $CMD "export TMPDIR\n" );
                 }
 	    }
-	    
-            # set path in bat file
-            if ( $DSD_defaults::dsd_isNT )
-            {
-		print( $CMD "set PATH=$ENV{'Path'}\n") ;
-            }
+		if (length $module) 
+		{
+			print( $CMD "module load \"$module\"\n" );
+	    }
+		
+		# set path in bat file
+		if ( $DSD_defaults::dsd_isNT )
+		{
+			print( $CMD "set PATH=$ENV{'Path'}\n") ;
+		}
 
 	    print( $CMD $executable) ;
 	    print( $CMD " $args\n");
@@ -197,10 +203,6 @@ sub detectPBSAndVersion()
 	= DSD_basequeue::runAndReturnOutputs($bin_location. "sinfo --version",\@stdoutFile, \@stderrFile);
     if($ran){
 	foreach (@stdoutFile,@stderrFile){
-	    if (/PBSPro/i)
-	    {
-		return 0;
-	    }
 	    if (/slurm (.*)/i){
 		($version) = "SLURM ".$1;
 		$ispbs = 1;
@@ -247,16 +249,16 @@ sub GetJobStatus($;$)
 	    ($shortId,$name,$user,$use,$status,$queue) = split /\s+/, $line;
 	    my ($numid,@rubbish) = split '\.', $shortId; 
 	    if($G_numid eq $numid ){
-# Found!
-		if(($status eq "R") || ($status eq "E")) #"E" exiting . Should it be here ?
-		{
-		    return DSD_basequeue::QJOB_RUNNING; 
-		}
-		if( ($status eq "C")) #"C" exiting
-		{
-		    return DSD_basequeue::QJOB_FINISHED; 
-		}
-		return  DSD_basequeue::QJOB_STARTED;
+			# Found!
+			if(($status eq "R") || ($status eq "E")) #"E" exiting . Should it be here ?
+			{
+				return DSD_basequeue::QJOB_RUNNING; 
+			}
+			if( ($status eq "C")) #"C" exiting
+			{
+				return DSD_basequeue::QJOB_FINISHED; 
+			}
+			return  DSD_basequeue::QJOB_STARTED;
 	    }
 	}
 	
