@@ -84,7 +84,6 @@ BEGIN
 	#any additional parameters ?
 	my $params = DSD_basequeue::get_config_info_item ('params', "$myloc/${cfgname}.cfg");
 	$params = " --job-name=$jobName $params " if ($jobid);
-	my $module = DSD_basequeue::get_config_info_item ('module', "$myloc/${cfgname}.cfg");
 	my $cpu = DSD_utils::get_jobinfoitem('job-cpu-number', $jobid,	1); # reverse search
 
 	my $queueExtraParams = $DSD_basequeue::G_queueExtraParams;
@@ -97,11 +96,8 @@ BEGIN
 	}
 
 	$args =~ s/\s-nolocal\s/ /; # do not use mpi -nolocal 
-	
-	
 
-
-	my $qsubCmd = "$qsub -V $params $queueParams $cmd";
+	my $qsubCmd = "$qsub $params $queueParams $cmd";
 	
 	if(open (my $CMD, ">$cmd"))
 	{
@@ -131,10 +127,6 @@ BEGIN
                     print( $CMD "export TMPDIR\n" );
                 }
 	    }
-		if (length $module) 
-		{
-			print( $CMD "module load \"$module\"\n" );
-	    }
 		
 		# set path in bat file
 		if ( $DSD_defaults::dsd_isNT )
@@ -153,7 +145,7 @@ BEGIN
 		my @out = <$QSUB>;
 		close ($QSUB);
 
-		if(@out[0] =~ m/^\d/) ##first digit , OK !
+		if(@out[0] =~ m/\d$/) ##first digit , OK !
 		{
 		    $DSD_basequeue::G_id = $out[0];
 		    $DSD_basequeue::G_status =  DSD_basequeue::QJOB_STARTED;
@@ -236,7 +228,8 @@ sub GetJobStatus($;$)
     my ($myself, $_id)=@_;
     my($shortId,$name,$user,$use,$status,$queue);
     $_id=$DSD_basequeue::G_id unless defined($_id);
-    my $qstat = $bin_location. "qstat " . $_id;
+    my $qstat = $bin_location. "squeue -h -j " . $_id . " -o \"%i %T\"";
+;
     
     my($couldRun, $rc, @stdoutFile, @stderrFile);    
     ($couldRun, $rc) 
@@ -244,19 +237,35 @@ sub GetJobStatus($;$)
     if ($couldRun)
     {
 	
-	my ( $G_numid, @rubbish) = split '\.', $_id; 
+	#my ( $G_numid, @rubbish) = split '\.', $_id; 
 	foreach my $line (@stdoutFile) {
-	    ($shortId,$name,$user,$use,$status,$queue) = split /\s+/, $line;
+	    ($shortId,$status) = split /\s+/, $line;
 	    my ($numid,@rubbish) = split '\.', $shortId; 
-	    if($G_numid eq $numid ){
+	    if($_id eq $numid ){
 			# Found!
-			if(($status eq "R") || ($status eq "E")) #"E" exiting . Should it be here ?
+			if( ($status eq "PENDING")) 
+			{
+				return DSD_basequeue::QJOB_QUEUED; 
+			}
+			if(($status eq "RUNNING") || ($status eq "COMPLETING")) #"E" exiting . Should it be here ?
 			{
 				return DSD_basequeue::QJOB_RUNNING; 
 			}
-			if( ($status eq "C")) #"C" exiting
+			if( ($status eq "COMPLETED")) #"C" exiting
 			{
 				return DSD_basequeue::QJOB_FINISHED; 
+			}
+			if( ($status eq "SUSPENDED")) 
+			{
+				return DSD_basequeue::QJOB_PAUSED; 
+			}
+			if( ($status eq "CANCELLED"))
+			{
+				return DSD_basequeue::QJOB_STOPPED; 
+			}
+			if( ($status eq "FAILED") || ($status eq "TIMEOUT"))
+			{
+				return DSD_basequeue::QJOB_FAILED; 
 			}
 			return  DSD_basequeue::QJOB_STARTED;
 	    }
@@ -300,7 +309,7 @@ sub Stop($;$)
     my($myself,$pid) =@_;
     $pid=$DSD_basequeue::G_id unless defined($pid);
     my $success;
-    my $qdel = $bin_location."qdel";
+    my $qdel = $bin_location."scancel";
     if (open(my $QDEL, "$qdel $pid|")) 
     {
 	close($QDEL);
@@ -321,13 +330,11 @@ sub GetAvailableQueues($$;$)
     my $def_queue = GetDefaultQueue($self);
     my @names;
     push @names,$def_queue;
-    if (open(my $QSTAT, "$bin_location" . "qstat -Q -f |")){
+    if (open(my $QSTAT, "$bin_location" . "sinfo -h -o \"%R\" |")){
 	foreach (<$QSTAT>){
-	    if(/^Queue:(.*)$/){
-		my $qn=$1;
+		my $qn=$_;
 		$qn=~s/^\s+|\s+$//g;		
 		push @names, $qn if $qn ne $def_queue;
-	    }
 	}
     }
     return @names;
@@ -339,7 +346,7 @@ sub GetDefaultQueue($)
     my ($myself) = @_;
     my $myloc=DSD_basequeue::MyLocation($myself);
     my $default_queue = DSD_basequeue::get_config_info_item ("default_queue","$myloc/${cfgname}.cfg");
-    if( !$default_queue && (open (my $QMGR, 'sinfo -h | cut -f1 -d\' \' |')))
+    if( !$default_queue && (open (my $QMGR, 'sinfo -h -o \"%P\"  |')))
     {
 	my @lines = <$QMGR>;
 	close ($QMGR);
@@ -383,13 +390,10 @@ sub EstimateCPUperNode()
     my $ispbs = 0;
     my $version;
     ($ran, $rc) 
-	= DSD_basequeue::runAndReturnOutputs($bin_location. "pbsnodes",\@stdoutFile, \@stderrFile);
+	= DSD_basequeue::runAndReturnOutputs($bin_location. "sinfo -h -o \"%c\"",\@stdoutFile, \@stderrFile);
     if($ran){	
 	foreach (@stdoutFile){
-	    if( /np/){
-		my @np=split(" ",$_);
-		$numpr= $np[2] if ( $np[2] > 1 && $np[2] < $numpr );
-	    }
+	    $numpr = $_;
 	}
     }
     $numpr =1 if ($numpr==10000);
