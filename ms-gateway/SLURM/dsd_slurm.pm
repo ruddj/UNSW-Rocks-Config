@@ -228,7 +228,7 @@ sub GetJobStatus($;$)
     my ($myself, $_id)=@_;
     my($shortId,$name,$user,$use,$status,$queue);
     $_id=$DSD_basequeue::G_id unless defined($_id);
-    my $qstat = $bin_location. "squeue -h -j " . $_id . " -o \"%i %T\"";
+    my $qstat = $bin_location . 'squeue --noheader --states=all --jobs=' . $_id . ' --format="%i %T"';
 ;
     
     my($couldRun, $rc, @stdoutFile, @stderrFile);    
@@ -296,7 +296,7 @@ sub GetJobStatus($;$)
 }
 
 
-# When to use queue: when starting the script or execuatable
+# When to use queue: when starting the script or executable
 # should return one of the "using queue" constants (see at the top)
 sub WhenToStart(;$)
 		{
@@ -330,7 +330,7 @@ sub GetAvailableQueues($$;$)
     my $def_queue = GetDefaultQueue($self);
     my @names;
     push @names,$def_queue;
-    if (open(my $QSTAT, "$bin_location" . "sinfo -h -o \"%R\" |")){
+    if (open(my $QSTAT, "$bin_location" . 'sinfo --noheader --format="%R" |')){
 	foreach (<$QSTAT>){
 		my $qn=$_;
 		$qn=~s/^\s+|\s+$//g;		
@@ -346,7 +346,7 @@ sub GetDefaultQueue($)
     my ($myself) = @_;
     my $myloc=DSD_basequeue::MyLocation($myself);
     my $default_queue = DSD_basequeue::get_config_info_item ("default_queue","$myloc/${cfgname}.cfg");
-    if( !$default_queue && (open (my $QMGR, 'sinfo -h -o \"%P\"  |')))
+    if( !$default_queue && (open (my $QMGR, "$bin_location" . 'sinfo --noheader --format="%P" |')))
     {
 	my @lines = <$QMGR>;
 	close ($QMGR);
@@ -390,7 +390,7 @@ sub EstimateCPUperNode()
     my $ispbs = 0;
     my $version;
     ($ran, $rc) 
-	= DSD_basequeue::runAndReturnOutputs($bin_location. "sinfo -h -o \"%c\"",\@stdoutFile, \@stderrFile);
+	= DSD_basequeue::runAndReturnOutputs($bin_location . 'sinfo --noheader --format="%c"',\@stdoutFile, \@stderrFile);
     if($ran){	
 	foreach (@stdoutFile){
 	    $numpr = $_;
