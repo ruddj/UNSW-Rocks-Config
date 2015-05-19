@@ -43,18 +43,24 @@ unset TMPDIR
 export SLURM_TMPDIR=/state/partition1/$LOGNAME.$SLURM_JOB_ID
 
 if [ ! -d "$SLURM_TMPDIR" ]; then
- /bin/mkdir -p $SLURM_TMPDIR
+ /bin/mkdir --mode=2775 $SLURM_TMPDIR
  /bin/chgrp users $SLURM_TMPDIR
- /bin/chmod 2775 $SLURM_TMPDIR
  echo "print \$TMPDIR local temp directory created $SLURMD_NODENAME:$SLURM_TMPDIR"
 fi
+
+if [[ $SLURM_JOB_NUM_NODES -gt 1 ]]; then
+ srun --ntasks-per-node=1 /bin/mkdir --mode=2775 $SLURM_TMPDIR
+ srun --ntasks-per-node=1 /bin/chgrp users $SLURM_TMPDIR
+fi
+
 pbs_compat TMPDIR    "$SLURM_TMPDIR"
 
 
 if [[ -n "$SLURM_JOB_NODELIST" ]]; then
-    TMPFILE=$(mktemp -t pbsnodefile.XXXXXXXXXX)
+    TMPFILE=$(mktemp $SLURM_TMPDIR/pbsnodefile.XXXXXXXXXX)
     scontrol show hostnames "$SLURM_JOB_NODELIST" >$TMPFILE
+	/bin/chmod 644 \$TMPFILE
     pbs_compat PBS_NODEFILE $TMPFILE
 fi
 
-
+exit 0
