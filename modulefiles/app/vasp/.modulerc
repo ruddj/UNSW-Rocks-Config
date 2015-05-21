@@ -1,4 +1,0 @@
-#%Module1.0
-##
-module-version      "vasp/5.2/pgi-ompi"	"default"
-

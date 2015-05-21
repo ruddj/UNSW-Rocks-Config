@@ -1,6 +1,0 @@
-#%Module1.0###########################################################
-##
-## version file for Vasp
-##
-
-set ModulesVersion      "5.2"

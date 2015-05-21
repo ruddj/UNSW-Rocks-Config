@@ -1,0 +1,37 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      2.10
+
+#
+# 2. change 'namdhome' to base directory: /usr/namd, /opt/namd, ...
+#
+
+set    namdhome      /share/apps/namd
+
+set  namddir  $namdhome/NAMD\_$version\_Linux-x86\_64-TCP
+
+if [ file isdirectory "$namddir" ] {
+    module-whatis	"Installs NAMD $version "
+    set helpmsg "Sets NAMD to Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $namddir
+    
+} else {
+    module-whatis	"NAMD $version not installed"
+    set helpmsg "NAMD $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"NAMD $version  not installed on [uname nodename]"
+    }
+}
+

@@ -1,0 +1,57 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict siesta
+
+if { [ is-loaded  mpich ] } {
+    module rm mpich
+}
+
+if { ! [ is-loaded openmpi/1.8.4-gcc-4.4 ] } {
+    module load openmpi/1.8.4-gcc-4.4
+}
+
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      3.2.5
+set     name         Siesta
+#
+# 2. change 'mpihome' to base directory: /usr/mpi, /opt/mpi, ...
+#/share/apps/siesta/3.2.5-gcc-4.4-ompi 
+set	mpihome      /share/apps/siesta
+
+#
+# 3. change 'cpp' to compiler: pgi, intel, ...
+#
+set	cpp      gcc-4.4
+
+# 4. change 'mpi' to MPI system used: mpich, openmpi, ...
+#
+set	mpi      ompi
+
+
+set mpidir $mpihome/$version-$cpp-$mpi
+
+if [ file isdirectory $mpidir ] {
+    module-whatis	"Installs $name $version for $cpp $mpi"
+    set helpmsg "Sets $name to Compiler $cpp MPI $mpi Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $mpidir
+    
+} else {
+    module-whatis	"$name $version $cpp $mpi not installed"
+    set helpmsg "$name $cpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"$name $version $cpp $mpi not installed on [uname nodename]"
+    }
+}
+

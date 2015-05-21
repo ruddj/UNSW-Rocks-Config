@@ -1,0 +1,38 @@
+#%Module######################################################################
+##
+##      Materials Studio modulefile
+##
+proc ModulesHelp { } {
+    puts stderr "Set environment for Materials Studio $version"
+}
+
+set base_path /share/apps/accelrys
+set version   8.0
+
+if { ! [ is-loaded g09 ] } {
+    module load "g09"
+}
+
+module-whatis "Setup Materials Studio $version"
+
+set ms_path $base_path/MaterialsStudio$version
+set lp_path $base_path/LicensePack
+
+# Replace with server info
+setenv MSI_LICENSE_FILE   $lp_path/Licenses:1715@abacus.imdc.unsw.edu.au
+#setenv MSI_LICENSE_FILE  /share/apps/accelrys/LicensePack/Licenses:1715@abacus.imdc.unsw.edu.au
+
+prepend-path PATH $ms_path/bin:$lp_path/linux/bin
+prepend-path     LD_LIBRARY_PATH $ms_path/lib:$lp_path/linux/lib
+
+setenv MS_INSTALL_ROOT  $ms_path
+setenv ACCELRYS_LIC_PACK_DIR $lp_path
+setenv MSI_LIC_PACK_DIR $lp_path
+
+setenv ACCELRYS_LICENSE_PLATFORM  linux
+
+setenv DSD_ROOT $ms_path/etc/Gateway/root_default/dsd
+prepend-path PERL5LIB $ms_path/lib/5.8.9:$ms_path/lib/site_perl/5.8.9:$ms_path/etc/Gateway/root_default/dsd/commands
+prepend-path LD_LIBRARY_PATH $ms_path/lib/5.8.9/x86_64-linux-thread-multi/CORE
+
+

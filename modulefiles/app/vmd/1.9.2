@@ -1,0 +1,38 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      1.9.2
+
+#
+# 2. change 'namdhome' to base directory: /usr/namd, /opt/namd, ...
+#
+
+set    namdhome      /share/apps/namd
+
+set  namddir  $namdhome/vmd-$version
+
+if [ file isdirectory "$namddir" ] {
+    module-whatis	"Installs VMD $version "
+    set helpmsg "Sets VMD to Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $namddir/bin
+    setenv  VMDDIR  $namddir
+
+} else {
+    module-whatis	"VMD $version not installed"
+    set helpmsg "VMD $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"VMD $version  not installed on [uname nodename]"
+    }
+}
+

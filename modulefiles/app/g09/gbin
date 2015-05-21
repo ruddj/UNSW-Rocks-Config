@@ -11,7 +11,7 @@ conflict g03
 conflict g09
 
 set     g09dir      /gaussian
-set     g09scratch      /state/workspace
+set     g09scratch      /state/partition1
 set     g09exe  "$g09dir/g09/bsd:$g09dir/g09"
 set     g09man   $g09dir/g09/bsd   
 set     g09gv       $g09dir/gv

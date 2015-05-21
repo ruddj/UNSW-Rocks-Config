@@ -1,0 +1,38 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      2.25
+#
+# 2. change 'prefixhome' to base directory: /usr/binutils, /opt/binutils, ...
+#
+set	prefixhome      /share/apps/opt/binutils
+
+set prefixdir $prefixhome/$version
+
+if [ file isdirectory $prefixdir/bin ] {
+    module-whatis	"Adds binutils $version to environment"
+    set helpmsg "Adds binutils to environment Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $prefixdir/bin
+    prepend-path MANPATH :$prefixdir/share/man
+    prepend-path LD_LIBRARY_PATH $prefixdir/lib
+#    prepend-path CFLAGS "-I$prefixdir/include"
+} else {
+    module-whatis	"binutils $version not installed"
+    set helpmsg "binutils not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"binutils $version not installed on [uname nodename]"
+    }
+}
+

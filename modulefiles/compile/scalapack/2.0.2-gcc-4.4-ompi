@@ -1,0 +1,48 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+# Only 1 OpenBLAS at a time
+conflict scalapack
+
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      2.0.2
+
+#
+# 2. change 'fftwhome' to base directory: /usr/fftw, /opt/fftw, ...
+#
+set	gbhome      /share/apps/opt/scalapack
+
+#
+# 3. change 'gbcpp' to compiler: pgi, intel, ...
+#
+set	gbcpp      gcc
+set	cppver	 4.4
+set     mpi      ompi
+
+#/share/apps/opt/scalapack/2.0.2-gcc-4.4-ompi
+set gbdir $gbhome/$version-$gbcpp-$cppver-$mpi
+
+if [ file isdirectory $gbdir ] {
+    module-whatis	"Adds ScalaPack to libraries $gbcpp $version"
+    set helpmsg "Adds ScalaPack to libraries $gbcpp Version $version. Link with libopenblas.a or -lopenblas for shared library"
+    
+    # bring in new version
+    prepend-path LD_LIBRARY_PATH $gbdir
+#    prepend-path CFLAGS "-I$gbdir/include"
+
+} else {
+    module-whatis	"ScalaPack $gbcpp $version not installed"
+    set helpmsg "ScalaPack $gbcpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"ScalaPack $gbcpp $version not installed on [uname nodename]"
+    }
+}

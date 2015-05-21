@@ -1,0 +1,28 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+#
+# 2. change 'modhome' to base directory: /usr/fftw, /opt/fftw, ...
+#
+set moddir  /share/apps/opt/stubl
+
+if [ file isdirectory $moddir ] {
+    module-whatis	"Adds Slurm Tools and UBiLities to path"
+    set helpmsg "Adds Slurm Tools and UBiLities to path"
+    # bring in new version
+    setenv STUBL_HOME $moddir 
+    prepend-path PATH $moddir/bin
+
+} else {
+    module-whatis	"Slurm Tools and UBiLities not installed"
+    set helpmsg "Slurm Tools and UBiLities  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"Slurm Tools and UBiLities not installed on [uname nodename]"
+    }
+}
