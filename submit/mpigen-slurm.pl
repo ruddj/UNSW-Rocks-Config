@@ -230,13 +230,9 @@ echo "Working directory is:"
 pwd
 source /etc/profile
 
-\# Loads Gaussian application directory
+\# Loads MPI modules
 module load $queues{$queueSelect}{'module'}
 
-export GAUSS_JOBID=\$SLURM_JOB_ID
-export GAUSS_USER=\$SLURM_SUBMIT_DIR
-export TSNET_PATH=\$GAUSS_LEXEDIR
-export g09error=""
 export OMP_NUM_THREADS=1
 GAOPT
 
@@ -269,7 +265,7 @@ MPI
 print SCRIPT <<MPIPROG;
 \# Main Program Run
 date 
-time mpirun --bind-to-core  $file 
+time mpirun --bind-to core  $file 
 date
 
 MPIPROG
@@ -282,7 +278,7 @@ print SCRIPT "\n\# Email finish report\n",
 	"| /bin/mailx -s \"Job \$SLURM_JOB_ID: $file Completed\" $EMAIL",
 	"\n\n";
 	
-print SCRIPT 'echo "Finished job $GAUSS_JOBID"';
+print SCRIPT 'echo "Finished job $SLURM_JOB_ID"';
 close SCRIPT;
 
 
