@@ -63,7 +63,17 @@ my %queues = (
 	    'module' => 'g09/gbin',
 	    'desc' => 'Small Memory Jobs on 20 core Dell FC630 w/ 128GB Ram'
 	    },
-	'3'   =>  {
+   '3'   =>  {
+       'name' => 'Mem128s',
+       'queue' => 'Mem128s',
+       'cpu' => 20,
+       'par' => 1,
+       'maxmem' => '125000',
+     'deftime' => '04:00:00',
+       'module' => 'g09/gbin',
+       'desc' => 'Small Memory Jobs on 20 core Dell FC430 w/ 128GB Ram'
+       },
+	 '4'   =>  {
 	    'name' => 'Mem256',
 	    'queue' => 'Mem256',
 	    'cpu' => 20,
@@ -73,7 +83,7 @@ my %queues = (
 	    'module' => 'g09/gbin',
 	    'desc' => 'Medium Memory Jobs on 20 core Dell FC630 w/ 256GB Ram'
 	    },
-	'4'   =>  {
+	'5'   =>  {
 	    'name' => 'Mem512',
 	    'queue' => 'Mem512',
 	    'cpu' => 20,
