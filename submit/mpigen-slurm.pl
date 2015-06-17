@@ -32,7 +32,7 @@ $numNodes=$ARGV[1] if (@ARGV >= 2);
 my $PROCSHARED=20; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
-my $EMAILNOTIFY="ALL";
+my $EMAILNOTIFY="FAIL";
 my $EMAIL="$userName\@unsw.edu.au";
 
 # Queues

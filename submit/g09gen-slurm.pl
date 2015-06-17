@@ -35,7 +35,7 @@ my $MEMOD=0; #overide value
 my $PROCSHARED=20; # how many processors for each PC
 my $PROCSHAREDOD=1; #overide value
 
-my $EMAILNOTIFY="ALL";
+my $EMAILNOTIFY="FAIL";
 my $EMAIL="$userName\@unsw.edu.au";
 
 # Queues
