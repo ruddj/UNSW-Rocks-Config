@@ -112,7 +112,7 @@ if ( -f $CONFIGFILE){
 			$PROCSHARED=$1;
 		}
 		elsif ($line =~ /^EMAILNOTIFY[\s]*=[\s]*([\w]+)/i){ 
-			if ($line =~ /^EMAILNOTIFY[\s]*=[\s]*([beasn]+)[\s]*(#|$)/i){ 
+			if ($line =~ /^EMAILNOTIFY[\s]*=[\s]*(BEGIN|END|FAIL|REQUEUE|ALL)[\s]*(#|$)/i){ 
 				$EMAILNOTIFY=$1;
 			}
 			else {
@@ -131,7 +131,7 @@ else {
 	open CONFIG, " > $CONFIGFILE";
 	print CONFIG <<CONF;
 #Following sets Slurm Options
-#EMAILNOTIFY=ALL 	# Notify actions for email
+#EMAILNOTIFY=FAIL 	# Notify actions for email
 #EMAIL=$userName\@unsw.edu.au	# Email address to send to
 
 #Following sets options inside Gaussian file
