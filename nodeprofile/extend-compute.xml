@@ -9,8 +9,8 @@
 
 <changelog>
 <![CDATA[
-  $Id: extend-compute.xml 53 2010-08-10 09:00:38Z root $
-  $Date: 2010-08-10 19:00:38 +1000 (Tue, 10 Aug 2010) $
+  $Id: extend-compute.xml,v 1.1 2016/04/11 02:07:37 root Exp root $
+  $Date: 2016/04/11 02:07:37 $
 ]]>
 </changelog>
 
@@ -31,6 +31,7 @@
  -->
 
 <!-- Mellanox Infiniband Drivers -->
+<!-- Moved to OFED roll
 <package>mlnxofed-docs</package>
 <package>ofed-scripts</package>
 <package>libibverbs</package>
@@ -76,7 +77,9 @@
 <package>kernel-ib-devel</package>
 <package>kernel-ib</package>
 <package>kernel-mft</package>
-<package>rdma</package>
+ -->
+
+<!-- <package>rdma</package> -->
 
 <post>
         <!-- Insert your post installation script here. This
@@ -91,11 +94,6 @@ export -f module
 ]]>
 </file>
 
-<file name="/var/spool/torque/mom_priv/config" mode="append">
-$pbsclient &Kickstart_PublicHostname;
-$pbsclient &Kickstart_PrivateAddress;
-$tmpdir    /state/partition1
-</file>
 
 <file name="/etc/rc.d/rocksconfig.d/post-03-411get" perms="0700">
 <![CDATA[
