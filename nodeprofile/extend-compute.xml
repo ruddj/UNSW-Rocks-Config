@@ -23,64 +23,15 @@
 <package>environment-modules</package>
 -->
 
-<!-- Updated Kernel for AMD Interlagos Support -->
-<!--  <package>kernel-ml</package>
-<package>kernel-ml-devel</package>
-<package>kernel-ml-doc</package>
-<package>kernel-ml-headers</package>
- -->
+<package>compat-libstdc++-33.i686</package>
+<package>libxml2.i686</package>
+<package>binutils-devel</package>
+<package>bash-completion</package>
+<package>glibc-devel.i686</package>
+<package>screen</package>
+<package>lynx</package>
 
-<!-- Mellanox Infiniband Drivers -->
-<!-- Moved to OFED roll
-<package>mlnxofed-docs</package>
-<package>ofed-scripts</package>
-<package>libibverbs</package>
-<package>libibverbs-utils</package>
-<package>libmlx4</package>
-<package>libmlx5</package>
-<package>libibverbs-devel</package>
-<package>librdmacm</package>
-<package>librdmacm-utils</package>
-<package>librdmacm-devel</package>
-<package>libibumad</package>
-<package>libibmad</package>
-<package>mstflint</package>
-<package>mft</package>
-<package>fca</package>
-<package>knem</package>
-<package>openshmem</package>
-<package>opensm-libs</package>
-<package>mxm</package>
-<package>bupc</package>
-<package>ibacm</package>
-<package>compat-dapl</package>
-<package>compat-dapl-devel</package>
-<package>dapl</package>
-<package>dapl-devel</package>
-<package>dapl-devel-static</package>
-<package>dapl-utils</package>
-<package>infiniband-diags</package>
-<package>infiniband-diags-compat</package>
-<package>infinipath-psm</package>
-<package>ibutils2</package>
-<package>ibutils</package>
-<package>cc_mgr</package>
-<package>dump_pr</package>
-<package>ar_mgr</package>
-<package>ibdump</package>
-<package>qperf</package>
-<package>mstflint</package>
-<package>perftest</package>
-<package>libibprof</package>
-<package>mlnx-ofa_kernel</package>
-<package>mlnx-ofa_kernel-devel</package>
-<package>kernel-ib-devel</package>
-<package>kernel-ib</package>
-<package>kernel-mft</package>
- -->
-
-<!-- <package>rdma</package> -->
-
+  
 <post>
         <!-- Insert your post installation script here. This
         code will be executed on the destination node after the
@@ -129,6 +80,36 @@ fi
 ## Allows local users group to reboot this system
 %users  ALL = NOPASSWD: /sbin/reboot
 ]]>
+</file>
+
+</post>
+
+<post>
+<!-- Add a host redirector for non IB nodes -->
+<eval shell="bash" mode="xml">
+
+if [[ &hostname; != "compute-2-"* ]] ; then
+	echo "&lt;file name='/etc/hosts' mode='append' &gt;"
+	echo  "&lt;![CDATA["
+	echo  "# Infiniband not installed, override storage IP"
+	echo  "10.1.1.1        FyrHead.ibnet"
+	echo  "10.1.1.3        fyr-stor.ibnet"
+	echo  "]]&gt;"
+	echo "&lt;/file&gt;"
+fi
+
+</eval>
+
+<file name='/etc/sysconfig/network-scripts/ifup-ib' perms='0755'>
+<eval shell="sh">
+/bin/cat /export/rocks/install/site-profiles/6.2/nodes/ifup-ib
+</eval>
+</file>
+
+<file name='/etc/sysconfig/network-scripts/ifdown-ib' perms='0755'>
+<eval shell="sh">
+/bin/cat /export/rocks/install/site-profiles/6.2/nodes/ifdown-ib
+</eval>
 </file>
 
 </post>
