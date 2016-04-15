@@ -1,0 +1,19 @@
+#%Module 1.0
+
+# Module for Matlab 2015b
+
+proc ModulesHelp { } {
+    global version
+    puts stderr "This module sets the PATH environment variable for Matlab $version."
+}
+
+set base_path   /share/apps/opt/MATLAB
+set version     R2015b
+set path        $base_path/$version
+setenv MLM_LICENSE_FILE  27000@mathworks-1.lic.unsw.edu.au,27000@mathworks-2.lic.unsw.edu.au,27000@mathworks-3.lic.unsw.edu.au
+
+
+module-whatis   "Set the environment for Matlab $version"
+
+prepend-path    PATH            $path/bin
+

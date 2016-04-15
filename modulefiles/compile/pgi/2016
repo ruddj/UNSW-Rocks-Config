@@ -1,4 +1,4 @@
-#%Module2014#####################################################################
+#%Module2016#####################################################################
 
 proc ModulesHelp { } {
     global helpmsg
@@ -9,7 +9,7 @@ proc ModulesHelp { } {
 #
 # 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
 #
-set version 2014
+set version 2016
 set major X
 set minor X
 
@@ -59,7 +59,6 @@ set pgidir $pgihome/$target/$version
 if [ file isdirectory $pgidir/bin ] {
     module-whatis "Changes the PGI home directory to $target $version"
     prepend-path PGROUPD_LICENSE_FILE 27102@licence.eng.unsw.edu.au
-
     set helpmsg "
 Purpose
 -------
@@ -98,8 +97,8 @@ Additional PGI Resources
     setenv FC $pgidir/bin/pgfortran
     setenv F90 $pgidir/bin/pgf90
     setenv F77 $pgidir/bin/pgf77
-    setenv CPP $pgidir/bin/pgprepro
-    setenv CXX $pgidir/bin/pgcpp
+    setenv CPP $pgidir/bin/pgcc -Mcpp
+    setenv CXX $pgidir/bin/pgc++
     prepend-path PATH $pgidir/bin
     prepend-path MANPATH $pgidir/man
     if { $kern == "Darwin" } {
