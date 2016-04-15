@@ -1,0 +1,5 @@
+#PartitionName=WHEEL RootOnly=yes Priority=1000 Nodes=ALL
+PartitionName=amd Priority=10 
+PartitionName=intel Priority=10
+PartitionName=interlagos Priority=10 
+PartitionName=debug Priority=50  MaxTime=60 MaxNodes=1 Default=YES

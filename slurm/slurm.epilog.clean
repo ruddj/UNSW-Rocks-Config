@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# This script will kill any user processes on a node when the last
+# SLURM job there ends. For example, if a user directly logs into
+# an allocated node SLURM will not kill that process without this
+# script being executed as an epilog.
+#
+# SLURM_BIN can be used for testing with private version of SLURM
+#SLURM_BIN="/usr/bin/"
+#
+if [ x$SLURM_JOB_UID = "x" ] ; then 
+	exit 0
+fi
+
+if [ x$SLURM_JOB_ID = "x" ] ; then 
+        exit 0
+fi
+
+#
+# Don't try to kill user root or system daemon jobs
+#
+if [ $SLURM_JOB_UID -lt 800 ] ; then
+	exit 0
+fi
+
+job_list=`${SLURM_BIN}squeue --noheader --format=%A --user=$SLURM_JOB_UID --node=localhost`
+for job_id in $job_list
+do
+	job_id=`echo $job_id | cut -f1 -d_` 
+	if [ $job_id -ne $SLURM_JOB_ID ] ; then
+		exit 0
+	fi
+done
+
+#
+# No other SLURM jobs, purge all remaining processes of this user
+#
+pkill -KILL -U $SLURM_JOB_UID
+
+#Cleanup Temp Folder
+export TMPDIR=/state/partition1/$SLURM_JOB_USER.$SLURM_JOB_ID
+
+if [ -d "$TMPDIR" ]; then
+ /bin/rm -rf $TMPDIR
+fi
+
+exit 0

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# SLURM prolog to set PBS compatibility variables
+# [JNZ] Modified 28-Mar-2015
+
+pbs_compat () {
+    local pbs=$1
+    local slurm="$2"
+
+    if [[ -n "$slurm" ]]; then
+	echo "export $pbs=$slurm"
+    fi
+}
+
+pbs_compat PBS_ARRAYID		"$SLURM_ARRAY_JOB_ID"
+pbs_compat PBS_ARRAY_ID		"$SLURM_ARRAY_JOB_ID"
+pbs_compat PBS_ARRAY_INDEX	"$SLURM_ARRAY_TASK_ID"
+pbs_compat PBS_JOBDIR		"$PWD"
+pbs_compat PBS_JOBID		"$SLURM_JOB_ID"
+pbs_compat PBS_JOBNAME		"$SLURM_JOB_NAME"
+pbs_compat PBS_NODENUM		"$SLURM_NODEID"
+pbs_compat PBS_NP		"$SLURM_NTASKS"
+pbs_compat PBS_NUM_NODES	"$SLURM_JOB_NUM_NODES"
+pbs_compat PBS_NUM_PPN		"$SLURM_TASKS_PER_NODE"
+pbs_compat PBS_O_HOME		"$HOME"
+pbs_compat PBS_O_HOST		"$SLURM_SUBMIT_HOST"
+pbs_compat PBS_O_LANG		"$LANG"
+pbs_compat PBS_O_LOGNAME	"$LOGNAME"
+pbs_compat PBS_O_MAIL		"$MAIL"
+pbs_compat PBS_O_PATH		"$PATH"
+pbs_compat PBS_O_QUEUE		"$SLURM_JOB_PARTITION"
+pbs_compat PBS_O_SHELL		"$SHELL"
+pbs_compat PBS_O_SYSTEM		"$SYSTEM"
+pbs_compat PBS_O_WORKDIR	"$SLURM_SUBMIT_DIR"
+pbs_compat PBS_QUEUE		"$SLURM_JOB_PARTITION"
+pbs_compat PBS_SERVER		"$SLURM_SUBMIT_HOST"	# May be incorrect
+pbs_compat PBS_TASKNUM		"$SLURM_PROCID"
+
+# We do NOT set PBS_ENVIRONMENT, as it confuses Intel MPI
+
+# Create TMP Directory
+unset TMPDIR
+export SLURM_TMPDIR=/state/partition1/$LOGNAME.$SLURM_JOB_ID
+
+if [ ! -d "$SLURM_TMPDIR" ]; then
+ /bin/mkdir --mode=2775 $SLURM_TMPDIR
+ /bin/chgrp users $SLURM_TMPDIR
+ echo "print \$TMPDIR local temp directory created $SLURMD_NODENAME:$SLURM_TMPDIR"
+fi
+
+#if [[ $SLURM_JOB_NUM_NODES -gt 1 ]]; then
+# srun --ntasks-per-node=1 /bin/mkdir --mode=2775 $SLURM_TMPDIR
+# srun --ntasks-per-node=1 /bin/chgrp users $SLURM_TMPDIR
+#fi
+
+pbs_compat TMPDIR    "$SLURM_TMPDIR"
+
+
+if [[ -n "$SLURM_JOB_NODELIST" ]]; then
+    TMPFILE=$(mktemp $SLURM_TMPDIR/pbsnodefile.XXXXXXXXXX)
+    scontrol show hostnames "$SLURM_JOB_NODELIST" >$TMPFILE
+	/bin/chmod 644 \$TMPFILE
+    pbs_compat PBS_NODEFILE $TMPFILE
+fi
+
+exit 0

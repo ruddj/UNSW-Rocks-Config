@@ -1,0 +1,1 @@
+TRESBillingWeights="CPU=1.0,Mem=0.25G,GRES/gpu=2.0" DefaultTime=60 DefMemPerCPU=512 MaxNodes=1
