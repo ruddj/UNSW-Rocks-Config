@@ -9,8 +9,8 @@
 
 <changelog>
 <![CDATA[
-  $Id: extend-compute.xml 53 2010-08-10 09:00:38Z root $
-  $Date: 2010-08-10 19:00:38 +1000 (Tue, 10 Aug 2010) $
+  $Id: extend-login.xml,v 1.1 2016/04/11 02:07:37 root Exp root $
+  $Date: 2016/04/11 02:07:37 $
 ]]>
 </changelog>
 
@@ -35,7 +35,14 @@
 <package>vim-common</package>
 <package>cmake</package>
 <package>flex</package>
-
+<package>qt-devel</package>
+<package>binutils-devel</package>
+<package>screen</package>
+<package>lynx</package>
+<package>bash-completion</package>
+<package>glibc-devel.i686</package>
+<package>compat-libstdc++-33.i686</package>
+<package>libxml2.i686</package>
 
 <!-- Fail 2 Ban to lockdown Login Nodes -->
 <package>fail2ban</package>
@@ -53,13 +60,6 @@ export -f module
 ]]>
 </file>
 
-<file name="/opt/torque/mom_priv/config" mode="append">
-<![CDATA[
-$pbsclient FyrHead.ad.unsw.edu.au
-$pbsclient 10.1.1.1
-$tmpdir    /state/partition1
-]]>
-</file>
 
 <file name="/etc/rc.d/rocksconfig.d/post-03-411get" perms="0700">
 <![CDATA[
@@ -102,22 +102,31 @@ PermitRootLogin without-password
 <file name="/etc/fail2ban/jail.local" mode="append">
 <![CDATA[
 [DEFAULT]
-ignoreip = 127.0.0.1 10.1.1.1
-bantime  = 600
-findtime  = 600
-maxretry = 5
-backend = auto
+ignoreip =  127.0.0.1 10.1.0.0/16
 
-[ssh-iptables]
+[sshd]
 enabled  = true
-filter   = sshd
-action   = iptables-allports[name=SSH, protocol=all]
-logpath  = /var/log/secure
 maxretry = 5
+banaction = iptables-allports
+
+[sshd-ddos]
+# This jail corresponds to the standard configuration in Fail2ban.
+# The mail-whois action send a notification e-mail with a whois request
+# in the body.
+enabled  = true
+banaction = iptables-allports
 
 ]]>
 </file>
 
+<file name="/etc/hosts"  mode="append">
+<![CDATA[
+# Infiniband not installed, override storage IP
+10.1.1.1        FyrHead.ibnet
+10.1.1.3        fyr-stor.ibnet
+
+]]>
+</file>
 
 </post>
 
