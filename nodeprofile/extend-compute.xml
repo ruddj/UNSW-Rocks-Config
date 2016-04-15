@@ -30,7 +30,7 @@
 <package>glibc-devel.i686</package>
 <package>screen</package>
 <package>lynx</package>
-
+<package>knem</package>
   
 <post>
         <!-- Insert your post installation script here. This
@@ -111,6 +111,14 @@ fi
 /bin/cat /export/rocks/install/site-profiles/6.2/nodes/ifdown-ib
 </eval>
 </file>
+
+<file name="/etc/security/limits.conf"  mode="append">
+<![CDATA[
+# Remove Memory Locks
+root             -       memlock        unlimited
+*                -       memlock        unlimited
+]]>
+</file>	
 
 </post>
 
