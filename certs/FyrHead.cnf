@@ -1,0 +1,28 @@
+[req]
+default_bits = 2048
+default_md = sha256
+distinguished_name = req_distinguished_name
+encrypt_key = no
+prompt = no
+string_mask = nombstr
+req_extensions = v3_req
+default_days    = 1090                   # how long to certify for
+default_crl_days= 1090                   # how long before next CRL
+
+[req_distinguished_name]
+countryName = AU
+localityName = Sydney
+stateOrProvinceName = NSW
+organizationName = University of New South Wales
+organizationalUnitName = SPREE
+commonName = FyrHead.pv.unsw.edu.au
+
+[v3_req]
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment, keyAgreement
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1   = FyrHead.pv.unsw.edu.au
+DNS.2   = Fyr.pv.unsw.edu.au
+
