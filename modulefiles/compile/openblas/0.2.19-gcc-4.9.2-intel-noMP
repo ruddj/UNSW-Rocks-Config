@@ -1,0 +1,56 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+# Only 1 OpenBLAS at a time
+conflict openblas
+
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      0.2.19
+
+#
+# 2. change 'fftwhome' to base directory: /usr/fftw, /opt/fftw, ...
+#
+set     gbhome      /share/apps/opt/openblas
+
+#
+# 3. change 'gbcpp' to compiler: pgi, intel, ...
+#
+set     gbcpp      gcc
+set     cppver   4.9.2
+set     proc     intel
+
+set gbdir $gbhome/$version-$gbcpp-$cppver-$proc-noMP
+
+if [ file isdirectory $gbdir ] {
+    module-whatis       "Adds OpenBLAS to libraries $gbcpp $version"
+    set helpmsg "Adds OpenBLAS to libraries $gbcpp Version $version. Link with libopenblas.a or -lopenblas for shared library"
+
+    # bring in new version
+    prepend-path LD_LIBRARY_PATH $gbdir/lib
+    prepend-path CFLAGS "-I$gbdir/include"
+
+    #setenv GOTO $gbdir
+
+     #Max number of GoTO threads.
+#    setenv  OPENBLAS_NUM_THREADS 1
+    #Max OpenMP Threads
+    #setenv  OMP_NUM_THREADS 1
+
+
+} else {
+    module-whatis       "OpenBLAS $gbcpp $version not installed"
+    set helpmsg "OpenBLAS $gbcpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+        # bring in new version
+        puts stderr     "GotoBLAS $gbcpp $version not installed on [uname nodename]"
+    }
+}
+

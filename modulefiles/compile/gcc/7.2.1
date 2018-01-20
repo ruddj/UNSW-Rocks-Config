@@ -1,0 +1,48 @@
+#%Module 1.0
+#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict pgi
+
+#
+# 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
+#
+set     version     7.2.1 
+#
+# 2. change 'gcchome' to base directory: /usr/gcc, /opt/gcc, ...
+#
+
+set     gcchome      /opt/rh/devtoolset-7
+set gccdir $gcchome/root
+
+
+if [ file isdirectory $gccdir/bin ] {
+    module-whatis       "Changes the GCC home directory to $version"
+    set helpmsg "Changes the GCC home directory to Version $version"
+    # bring in new version
+    setenv GCC $gcchome
+    setenv GCCDIR $gccdir
+
+    prepend-path     PATH            $gccdir/usr/bin
+    prepend-path     LD_LIBRARY_PATH $gccdir/usr/lib64:$gccdir/usr/lib
+    prepend-path     MANPATH         $gccdir/usr/share/man
+    prepend-path     INFOPATH        $gccdir/usr/share/info
+    prepend-path     PCP_DIR   $gccdir
+	prepend-path    PYTHONPATH      $gccdir/usr/lib64/python2.7/site-packages:$gccdir/usr/lib/python2.7/site-packages
+    setenv          PERL5LIB        $gccdir/usr/lib64/perl5/vendor_perl:$gccdir/usr/lib/perl5:$gccdir/usr/share/perl5/vendor_perl
+
+
+} else {
+    module-whatis       "GCC $version not installed"
+    set helpmsg "GCC $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+        # bring in new version
+        puts stderr     "GCC $version not installed on [uname nodename]"
+    }
+}
+

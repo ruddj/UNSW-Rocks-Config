@@ -1,0 +1,87 @@
+#%Module#####################################################################
+
+conflict openmpi
+conflict mpich
+conflict mvapich
+conflict pgi
+
+module load gcc/4.9.2
+
+    proc ModulesHelp { } {
+    global helpmsg
+    puts stderr "\t$helpmsg\n"
+}
+
+set pgiversion 4.9.2
+set libversion 1.10.2
+
+set kern [ exec uname -s ]
+set bits [ exec uname -m ]
+if { $kern == "Linux" } {
+  if { $bits == "x86_64" } {
+    set target linux86-64
+  } else {
+    puts stderr "openmpi not supported on systems other than linux86-64 for now.\n"
+    exit 1
+  }
+} elseif { $kern == "Darwin" } {
+  set target osx86-64
+}
+
+set libdir /share/apps/mpi/openmpi/1.10.2-gcc-4.9.2
+
+if [ file isdirectory $libdir ] {
+    module-whatis "Adds optional openmpi-$libversion library from GCC $pgiversion to environment"
+    set helpmsg "
+Purpose
+-------
+  This module file defines the system paths and environment variables
+  needed to use Open MPI version $libversion with the GCC Compilers and Tools
+  version $pgiversion.  The available compiler wrappers are mpicc, mpicxx,
+  mpic++, mpiCC, mpif77, and mpif90.
+
+
+Module Dependencies
+-------------------
+  gcc
+
+
+Product Description
+-------------------
+  The Open MPI Project is an open source MPI-2 implementation that is
+  developed and maintained by a consortium of academic, research, and
+  industry partners. Open MPI is therefore able to combine the
+  expertise, technologies, and resources from all across the High
+  Performance Computing community in order to build the best MPI library
+  available. Open MPI offers advantages for system and software vendors,
+  application developers and computer science researchers.
+
+
+Product and OS Dependencies
+---------------------------
+  For more information about Open MPI, see the following URL:
+
+    http://www.open-mpi.org/
+
+
+Documentation
+-------------
+  No online documentation provided.
+"
+    prepend-path GCC_OPTL_INCLUDE_DIRS "$libdir/include"
+    prepend-path GCC_OPTL_LIB_DIRS "$libdir/lib"
+    prepend-path PATH $libdir/bin
+    prepend-path MANPATH $libdir/share/man
+    if { $kern == "Linux" } {
+	prepend-path LD_LIBRARY_PATH $libdir/lib
+    } elseif { $kern == "Darwin" } {
+	prepend-path DYLD_LIBRARY_PATH $libdir/lib
+    }
+} else {
+    module-whatis "Optional libraries for GCC $pgiversion not installed"
+    set helpmsg "Optional libraries for GCC $pgiversion not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+        # bring in new pgiversion
+        puts stderr "Optional libraries for GCC $pgiversion not installed on [uname nodename]"
+    }
+}

@@ -1,0 +1,52 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict pgi
+
+#
+# 1. change 'version' string to appropriate version number: 6.0, 5.2, ...
+#
+set     version     3.6.3
+#
+# 2. change 'pyhome' to base directory: /share/apps/opt/python
+#
+set     pyhome      /share/apps/opt/python
+
+set pydir $pyhome/$version
+
+
+if [ file isdirectory $pydir/bin ] {
+    module-whatis       "Changes the Python home directory to $version"
+    set helpmsg "Changes the Python home directory to Version $version"
+    # bring in new version
+    setenv pydir $pydir
+	setenv pythonversion $version
+
+	
+
+
+    prepend-path     PATH             $pydir/bin
+    prepend-path     LD_LIBRARY_PATH  $pydir/lib
+    prepend-path     C_INCLUDE_PATH   $pydir/include
+	prepend-path     LIBPATH          $pydir/lib
+    prepend-path     MANPATH          $pydir/share/man
+
+    prepend-path     PKG_CONFIG_PATH  $pydir/lib/pkgconfig
+	prepend-path    PYTHONPATH        $pydir/lib/python3.6
+ #   prepend-path     INFOPATH        $pydir/share/info
+  
+
+} else {
+    module-whatis       "Python $version not installed"
+    set helpmsg "Python $version not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+        # bring in new version
+        puts stderr     "Python $version not installed on [uname nodename]"
+    }
+}
+
