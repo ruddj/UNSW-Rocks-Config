@@ -1,15 +1,20 @@
 #!/bin/bash
 passfile=~ruddj/ipmipass
 
-for i in {0..13}
+# FC630
+for j in {0..2}
 do
- echo "compute-1-$i"
-  ipmitool -I lan -H ipmi-1-$i.ipmi -f $passfile -U root chassis power $1
+  for i in {0..3}
+  do
+   echo "abacusc-$j-$i"
+   ipmitool -I lan -H abacusc-$j-$i-oob.imdc.unsw.edu.au -f $passfile -U root chassis power $1
+  done
 done
 
-for i in {0..6}
+# FC430
+for i in {0..7}
 do
- echo "Compute-2-$i"
- ipmitool -I lanplus -H ipmi-2-$i.ipmi -f $passfile -U root chassis power $1
+ echo "abacusc-3-$i"
+ ipmitool -I lanplus -H abacusc-3-$i-oob.imdc.unsw.edu.au -f $passfile -U root chassis power $1
 done
 
