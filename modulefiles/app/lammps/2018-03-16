@@ -1,0 +1,49 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict mpich
+
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+# /share/apps/lammps/2015-05-15-gcc-4.4/
+set     version      2018-03-16
+#
+# 2. change 'lammpshome' to base directory: /usr/lammps, /opt/lammps, ...
+#
+set	lammpshome      /share/apps/lammps
+
+
+#
+# 3. change 'cpp' to compiler: pgi, intel, ...
+#
+set	cpp      gcc-4.4
+
+# 4. change 'mpi' to MPI system used: mpich, openmpi, ...
+#
+#set	mpi      ompi
+
+
+set lammpsdir $lammpshome/$version-$cpp
+
+if [ file isdirectory $lammpsdir ] {
+    module-whatis	"Installs lammps $version for $cpp "
+    set helpmsg "Sets lammps to Compiler $cpp MPI  Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $lammpsdir
+    
+} else {
+    module-whatis	"lammps $version $cpp  not installed"
+    set helpmsg "lammps $cpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"lammps $version $cpp  not installed on [uname nodename]"
+    }
+}
+

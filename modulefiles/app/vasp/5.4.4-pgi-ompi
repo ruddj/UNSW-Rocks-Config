@@ -1,0 +1,70 @@
+#%Module1.0#####################################################################
+
+proc ModulesHelp { } {
+        global helpmsg
+
+        puts stderr "\t$helpmsg\n"
+}
+
+conflict vasp
+conflict mpich
+
+if { ! [ is-loaded pgi ] } {
+    module load pgi/2018
+}
+
+
+if { ! [ is-loaded fftw ] } {
+    module load fftw/3.3.8-pgi-2018
+}
+
+if { ! [ is-loaded  openmpi ] } {
+    module load openmpi/2.1.2-pgi-2018
+}
+
+if { ! [ is-loaded  qd ] } {
+    module load qd/2.3.20-pgi-2018
+}
+
+if { ! [ is-loaded  binutils ] } {
+    module load binutils
+}
+
+#
+# 1. change 'version' string to appropriate version number: 3.2.1, ...
+#
+set     version      5.4.4
+#
+# 2. change 'vasphome' to base directory: /usr/vasp, /opt/vasp, ...
+#
+set	vasphome      /share/apps/vasp
+
+
+#
+# 3. change 'cpp' to compiler: pgi, intel, ...
+#
+set	cpp      pgi
+
+# 4. change 'mpi' to MPI system used: mpich, openmpi, ...
+#
+set	mpi      ompi
+
+
+set vaspdir $vasphome/$version/$cpp-$mpi
+
+if [ file isdirectory $vaspdir ] {
+    module-whatis	"Installs vasp $version for $cpp $mpi"
+    set helpmsg "Sets vasp to Compiler $cpp MPI $mpi Version $version"
+    # bring in new version
+ 
+    prepend-path PATH $vaspdir
+    
+} else {
+    module-whatis	"vasp $version $cpp $mpi not installed"
+    set helpmsg "vasp $cpp  not installed"
+    if [ expr [ module-info mode load ] || [ module-info mode display ] ] {
+	# bring in new version
+	puts stderr 	"vasp $version $cpp $mpi not installed on [uname nodename]"
+    }
+}
+

@@ -1,0 +1,18 @@
+#%Module 1.0
+
+# Module for Matlab 2014b
+# [JNZ] Modified 08-Jan-2015
+
+proc ModulesHelp { } {
+    global version
+    puts stderr "This module sets the PATH environment variable for Matlab $version."
+}
+
+set base_path	/share/apps/matlab
+set version	2014b
+set path	$base_path/$version
+
+module-whatis	"Set the environment for Matlab $version"
+
+prepend-path	PATH		$path/bin
+prepend-path	XAPPLRESDIR	$path/X11/app-defaults
